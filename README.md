@@ -15,7 +15,7 @@ In this folder you can find the python plugin for Domoticz: **you can install th
 
 # Installation
 
-<code>
+```bash
 #become root user
 sudo su -
 
@@ -37,7 +37,7 @@ pip3 install hyundai-kia-connect-api
 
 #restart Domoticz daemon
 service domoticz restart
-</code>
+```
 
 
 
