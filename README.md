@@ -1,6 +1,5 @@
 # Domoticz Hyundai-Kia plugin
-Author: Creasol - linux@creasol.it 
-Websites: https://www.creasol.it/domotics
+Author: Creasol https://www.creasol.it/domotics
 
 For any support request, please write email to linux@creasol.it or enter the Telegram DomBus group https://t.me/DomBus 
 
