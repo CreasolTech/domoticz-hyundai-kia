@@ -42,6 +42,8 @@ service domoticz restart
 
 Creasol is developing a __cheap and smart DIY EVSE module__ that can work stand-alone or connected to Domoticz.
 
+Video at https://www.youtube.com/watch?v=fyDtGO6S1UI
+
 Features:
 * detects plug connection and disconnection
 * detects when the electric vehicle starts and stops charging
