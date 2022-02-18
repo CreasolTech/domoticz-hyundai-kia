@@ -9,7 +9,7 @@ For any support request, please write email to linux@creasol.it or enter the Tel
 
 This plugin is designed for [Domoticz](https://www.domoticz.com) home automation system and provide a way to get status from Hyunday and Kia cars.
 
-It's based on the [hyundai-kia-connect-api](https://pypi.org/project/hyundai-kia-connect-api/) written by Fuat Akgun that must be installed using the command  
+It's based on the [hyundai-kia-connect-api](https://pypi.org/project/hyundai-kia-connect-api/) python library, written by Fuat Akgun.  
 
 In this folder you can find the python plugin for Domoticz: **you can install the hardware plugin by using Python Plugin Manager, or typing the following commands from the linux shell**:
 
