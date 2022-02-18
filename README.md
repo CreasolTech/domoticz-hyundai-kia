@@ -43,13 +43,9 @@ service domoticz restart
 Creasol is developing a __cheap and smart DIY EVSE module__ that, connected to Domoticz, is able to:
 
 * detects plug connection and disconnection
-
 * detects when the electric vehicle starts and stops charging
-
 * detects alarms from vehicle
-
 * interfaces a bidirectional energy meter to know the real time import or export power from grid
-
 * operates as __stand-alone__ (no need for a domotic controller) with the possibility to select two charging mode:
     1. __use the maximum power allowed by electricity meter__, preventing overloads and disconnections
     2. __use only renewable energy (keep import power around 0W)__
