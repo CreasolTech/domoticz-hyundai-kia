@@ -105,8 +105,10 @@ class BasePlugin:
     def __init__(self):
         self._pollInterval = 120        # fetch data every 120 minutes, by default (but check parameter Mode1!)
         self._pollIntervalCharging = 30 # while charging, fetch data quickly 
-        self._lastPoll = None    # last time I got vehicle status
+        self._lastPoll = None           # last time I got vehicle status
+        self._checkDevices = True       # if True, check that all devices are created (at startup and when update is forced)
         self._isCharging = False  
+        self._engineOn = False
         self._lang = "en"
         self.vm = None
 
@@ -115,7 +117,7 @@ class BasePlugin:
         if self._lastPoll == None: 
             return True
         elapsedTime = int( (datetime.now()-self._lastPoll).total_seconds() / 60)  # time in minutes
-        if (elapsedTime >= self._pollInterval or (self._isCharging and elapsedTime >= self._pollIntervalCharging)): 
+        if (elapsedTime >= self._pollInterval or ((self._isCharging or self._engineOn) and elapsedTime >= self._pollIntervalCharging)): 
             return True
         return False
 
@@ -145,18 +147,21 @@ class BasePlugin:
             ret=self.vm.update_all_vehicles_with_cached_state()
             Domoticz.Log(f"self.vm.update_all_vehicles_with_cached_state() returned {ret}")
             self.updatePollInterval()
+            self._isCharging=False  # set to false: if one vehicle is charging, this flag will be set by updateDevices()
+            self._engineOn=False    # set to false: if one vehicle is moving,   this flag will be set by updateDevices()
             # Now self.vm.vehicles contains a table with the list of registered vehicles and their parameters
             for k in self.vm.vehicles:
                 # k is the keyword associated to a Vehicle object
                 v = self.vm.get_vehicle(k)
                 name = v.name   # must be unique and identify the type of car, if more than 1 car is owned
                 Domoticz.Log(f"Name={v.name} Odometer={v._odometer_value}{v._odometer_unit} Battery={v.ev_battery_percentage}")
+                Domoticz.Log(f"Vehicle={v}")
             
                 # base = Unit base = 0, 32, 64, 96  # up to 4 vehicle can be addressed, 32 devices per vehicle (Unit <= 255)
                 # Find the right base
                 baseFree = 256
                 for base in range(0, 256+1, 32):
-                    if base+DEVS["ODOMETER"][0] in Devices and Devices[base+DEVS["ODOMETER"][0]].Name == f"{name} {DEVS['ODOMETER'][self._devlang]}":   
+                    if base+DEVS['ODOMETER'][0] in Devices and Devices[base+DEVS['ODOMETER'][0]].Name == f"{name} {DEVS['ODOMETER'][self._devlang]}":   
                         # odometer exists: check that Domoticz device name correspond with vehicle name (set on Kia connect)
                         break
                     else:
@@ -167,179 +172,283 @@ class BasePlugin:
                 if base >= 256 and baseFree < 256:
                     # car not found, but there is enough space for a new car
                     base = baseFree
-                    Domoticz.Log("Add devices for this new car")
-                    ############################################ Create new devices #########################################
-                    if v.ev_battery_is_charging != None: 
-                        Domoticz.Device(Unit=base+DEVS['EVSTATE'][0], Name=f"{name} {DEVS['EVSTATE'][self._devlang]}", Type=243, Subtype=19, Used=1).Create()
-                    if v.ev_battery_percentage != None:  
-                        Domoticz.Device(Unit=base+DEVS['EVBATTLEVEL'][0], Name=f"{name} {DEVS['EVBATTLEVEL'][self._devlang]}", Type=243, Subtype=6, Used=1).Create()
-                    if v.ev_driving_distance != None:
-                        Domoticz.Device(Unit=base+DEVS['EVRANGE'][0], Name=f"{name} {DEVS['EVRANGE'][self._devlang]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._ev_driving_distance_unit}, Used=1).Create()
-                    if v.fuel_level != None:  
-                        Domoticz.Device(Unit=base+DEVS['FUELLEVEL'][0], Name=f"{name} {DEVS['FUELLEVEL'][self._devlang]}", Type=243, Subtype=6, Used=1).Create()
-                    if v.fuel_driving_distance != None:
-                        Domoticz.Device(Unit=base+DEVS['FUELRANGE'][0], Name=f"{name} {DEVS['FUELRANGE'][self._devlang]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._fuel_driving_distance_unit}, Used=1).Create()
-                    if v.engine_is_running != None:
-                        Domoticz.Device(Unit=base+DEVS['ENGINEON'][0], Name=f"{name} {DEVS['ENGINEON'][self._devlang]}", Type=244, Subtype=73, Used=1).Create()
-                    if v.odometer != None:  
-                        Domoticz.Device(Unit=base+DEVS['ODOMETER'][0], Name=f"{name} {DEVS['ODOMETER'][self._devlang]}", Type=113, Subtype=0, Used=1).Create()
-                    # TODO: LOCATION
-
-                    # TODO: HOMEDIST
-
-                    # TODO: SPEED
-
-                    Domoticz.Device(Unit=base+DEVS['UPDATE'][0], Name=f"{name} {DEVS['UPDATE'][self._devlang]}", Type=244, Subtype=73, Used=1).Create() 
-                    # TODO: TEMPSET (thermostat)
-                    if v.air_control_is_on != None:
-                        Domoticz.Device(Unit=base+DEVS['CLIMAON'][0], Name=f"{name} {DEVS['CLIMAON'][self._devlang]}", Type=244, Subtype=73, Used=1).Create()
-                    if v.defrost_is_on != None:
-                        Domoticz.Device(Unit=base+DEVS['DEFROSTON'][0], Name=f"{name} {DEVS['DEFROSTON'][self._devlang]}", Type=244, Subtype=73, Used=1).Create()
-                    if v.back_window_heater_is_on != None:
-                        Domoticz.Device(Unit=base+DEVS['REARWINDOWON'][0], Name=f"{name} {DEVS['REARWINDOWON'][self._devlang]}", Type=244, Subtype=73, Used=1).Create()
-                    if v.steering_wheel_heater_is_on != None:
-                        Domoticz.Device(Unit=base+DEVS['STEERINGWHEELON'][0], Name=f"{name} {DEVS['STEERINGWHEELON'][self._devlang]}", Type=244, Subtype=73, Used=1).Create()
-                    if v.side_mirror_heater_is_on != None:
-                        Domoticz.Device(Unit=base+DEVS['SIDEMIRRORSON'][0], Name=f"{name} {DEVS['SIDEMIRRORSON'][self._devlang]}", Type=244, Subtype=73, Used=1).Create()
-                    if v.front_left_seat_status != None:
-                        Domoticz.Device(Unit=base+DEVS['SEATFL'][0], Name=f"{name} {DEVS['SEATFL'][self._devlang]}", Type=244, Subtype=19, Used=1).Create()
-                    if v.front_right_seat_status != None:
-                        Domoticz.Device(Unit=base+DEVS['SEATFR'][0], Name=f"{name} {DEVS['SEATFR'][self._devlang]}", Type=244, Subtype=19, Used=1).Create()
-                    if v.rear_left_seat_status != None:
-                        Domoticz.Device(Unit=base+DEVS['SEATRL'][0], Name=f"{name} {DEVS['SEATRL'][self._devlang]}", Type=244, Subtype=19, Used=1).Create()
-                    if v.rear_right_seat_status != None:
-                        Domoticz.Device(Unit=base+DEVS['SEATRR'][0], Name=f"{name} {DEVS['SEATRR'][self._devlang]}", Type=244, Subtype=19, Used=1).Create()
-                    if v.is_locked != None:
-                        Domoticz.Device(Unit=base+DEVS['OPEN'][0], Name=f"{name} {DEVS['OPEN'][self._devlang]}", Type=244, Subtype=73, Switchtype=19, Used=1).Create()
-                    if v.trunk_is_open != None:
-                        Domoticz.Device(Unit=base+DEVS['TRUNK'][0], Name=f"{name} {DEVS['TRUNK'][self._devlang]}", Type=244, Subtype=73, Switchtype=11, Used=1).Create()
-                    if v.hood_is_open != None:
-                        Domoticz.Device(Unit=base+DEVS['HOOD'][0], Name=f"{name} {DEVS['HOOD'][self._devlang]}", Type=244, Subtype=73, Switchtype=11, Used=1).Create()
-                    if v.car_battery_percentage != None:
-                        Domoticz.Device(Unit=base+DEVS['12VBATT'][0], Name=f"{name} {DEVS['12VBATT'][self._devlang]}", Type=243, Subtype=6, Used=1).Create()
-                    if v.smart_key_battery_warning_is_on != None:
-                        Domoticz.Device(Unit=base+DEVS['KEYBATT'][0], Name=f"{name} {DEVS['KEYBATT'][self._devlang]}", Type=243, Subtype=22, Used=1).Create()
-                    if v.washer_fluid_warning_is_on != None:
-                        Domoticz.Device(Unit=base+DEVS['WASHER'][0], Name=f"{name} {DEVS['WASHER'][self._devlang]}", Type=243, Subtype=6, Used=1).Create()
-                    if v.brake_fluid_warning_is_on != None:
-                        Domoticz.Device(Unit=base+DEVS['BRAKE'][0], Name=f"{name} {DEVS['BRAKE'][self._devlang]}", Type=243, Subtype=6, Used=1).Create()
-                    if v.tire_pressure_all_warning_is_on != None:
-                        Domoticz.Device(Unit=base+DEVS['TIRES'][0], Name=f"{name} {DEVS['TIRES'][self._devlang]}", Type=243, Subtype=6, Used=1).Create()
-
+                    self.addDevices(base, name, v)
                 if base < 256:
                     # car found or just created: update values
-                    ############################################ Update devices #########################################
-                    Domoticz.Log(f"Car found at base {base}")
-                    if v.ev_battery_is_charging != None:
-                        nValue=0
-                        sValue="Disconnected"
-                        if v.ev_battery_is_charging:
-                            nValue=1
-                            sValue="Charging"
-                        elif v.ev_battery_is_plugged_in:
-                            nValue=1
-                            sValue="Connected"
-                        Devices[base+DEVS['EVSTATE'][0]].Update(nValue=nValue, sValue=sValue)
-                    if v.ev_battery_percentage != None:
-                        nValue=v.ev_battery_percentage
-                        Devices[base+DEVS['EVBATTLEVEL'][0]].Update(nValue=nValue, sValue=str(nValue))
-                    nValue=v.ev_driving_distance
-                    if nValue != None:
-                        Devices[base+DEVS['EVRANGE'][0]].Update(nValue=nValue, sValue=str(nValue))
-                    nValue=v.fuel_level
-                    if nValue != None:
-                        Devices[base+DEVS['FUELLEVEL'][0]].Update(nValue=nValue, sValue=str(nValue))
-                    nValue=v.fuel_driving_distance
-                    if nValue != None:
-                        Devices[base+DEVS['FUELRANGE'][0]].Update(nValue=nValue, sValue=str(nValue))
-                    value=v.engine_is_running
-                    if value != None:
-                        nValue=1 if value else 0
-                        sValue="On" if value else "Off"
-                        Devices[base+DEVS['ENGINEON'][0]].Update(nValue=nValue, sValue=sValue)
-                    nValue=v.odometer
-                    if nValue != None:
-                        nValue=int(nValue)
-                        Devices[base+DEVS['ODOMETER'][0]].Update(nValue=nValue, sValue=str(nValue))
-                    # TODO: LOCATION
+                    if self._checkDevices == True: self.addDevices(base, name, v)
+                    self.updateDevices(base, name, v)    
+            self._checkDevices=False
 
-                    # TODO: HOMEDIST
+    def onCommand(self, Unit, Command, Level, Hue):
+        Domoticz.Log(f"onCommand(Unit={Unit}, Command={Command}, Level={Level}, Hue={Hue})")
+        if (Unit&31) == DEVS["UPDATE"][0]:  #force status update
+            Domoticz.Log("Force update command")
+            Devices[Unit].Update(nValue=1 if Command=="On" else 0, sValue=Command)
+            if Command=="On":
+                Domoticz.Log("Force update command")
+                self._checkDevices = True
+                self._lastPoll = None
+                self.onHeartbeat()
 
-                    # TODO: SPEED
 
-                    value=v.air_control_is_on
-                    if value != None:
-                        nValue=1 if value else 0
-                        sValue="On" if value else "Off"
-                        Devices[base+DEVS['CLIMAON'][0]].Update(nValue=nValue, sValue=sValue)
-                    value=v.defrost_is_on
-                    if value != None:
-                        nValue=1 if value else 0
-                        sValue="On" if value else "Off"
-                        Devices[base+DEVS['DEFROSTON'][0]].Update(nValue=nValue, sValue=sValue)
-                    value=v.back_window_heater_is_on
-                    if value != None:
-                        nValue=1 if value else 0
-                        sValue="On" if value else "Off"
-                        Devices[base+DEVS['REARWINDOWON'][0]].Update(nValue=nValue, sValue=sValue)
-                    value=v.steering_wheel_heater_is_on
-                    if value != None:
-                        nValue=1 if value else 0
-                        sValue="On" if value else "Off"
-                        Devices[base+DEVS['STEERINGWHEELON'][0]].Update(nValue=nValue, sValue=sValue)
-                    value=v.side_mirror_heater_is_on
-                    if value != None:
-                        nValue=1 if value else 0
-                        sValue="On" if value else "Off"
-                        Devices[base+DEVS['SIDEMIRRORSON'][0]].Update(nValue=nValue, sValue=sValue)
-                    sValue=v.front_left_seat_status
-                    if sValue != None:
-                        Devices[base+DEVS['SEATFL'][0]].Update(nValue=0, sValue=sValue)
-                    sValue=v.front_right_seat_status
-                    if sValue != None:
-                        Devices[base+DEVS['SEATFR'][0]].Update(nValue=0, sValue=sValue)
-                    sValue=v.rear_left_seat_status
-                    if sValue != None:
-                        Devices[base+DEVS['SEATRL'][0]].Update(nValue=0, sValue=sValue)
-                    sValue=v.rear_right_seat_status
-                    if sValue != None:
-                        Devices[base+DEVS['SEATRR'][0]].Update(nValue=0, sValue=sValue)
-                    value=v.is_locked
-                    if value != None:
-                        nValue=0 if value else 1
-                        sValue="Locked" if value else "Unlocked"
-                        Devices[base+DEVS['OPEN'][0]].Update(nValue=nValue, sValue=sValue)
-                    value=v.trunk_is_open
-                    if value != None:
-                        nValue=1 if value else 0
-                        sValue="Open" if value else "Closed"
-                        Devices[base+DEVS['TRUNK'][0]].Update(nValue=nValue, sValue=sValue)
-                    value=v.hood_is_open
-                    if value != None:
-                        nValue=1 if value else 0
-                        sValue="Open" if value else "Closed"
-                        Devices[base+DEVS['HOOD'][0]].Update(nValue=nValue, sValue=sValue)
-                    nValue=v.car_battery_percentage
-                    if nValue != None:
-                        sValue="Good" if nValue > 60 else "Low"
-                        Device[base+DEVS['12VBATT'][0]].Update(nValue=nValue, sValue=sValue)
-                    nValue=v.smart_key_battery_warning
-                    if nValue != None:
-                        sValue="Ok" if nValue == 0 else "Low"
-                        Device[base+DEVS['KEYBATT'][0]].Update(nValue=nValue, sValue=sValue)
-                    nValue=v.washer_fluid_warning_is_on
-                    if nValue != None:
-                        sValue="Ok" if nValue == 0 else "Empty"
-                        Device[base+DEVS['WASHER'][0]].Update(nValue=nValue, sValue=sValue)
-                    nValue=v.brake_fluid_warning_is_on
-                    if nValue != None:
-                        sValue="Ok" if nValue == 0 else "Empty"
-                        Device[base+DEVS['BRAKE'][0]].Update(nValue=nValue, sValue=sValue)
-                    nValue=v.tire_pressure_all_warning_is_on
-                    if nValue != None:
-                        sValue="Ok" if nValue == 0 else "Low"
-                        Device[base+DEVS['TIRES'][0]].Update(nValue=nValue, sValue=sValue)
+    def addDevices(self, base, name, v):
+        """ Add devices for car named {name}, starting from base unit {base}, using vehicle parameters in {v} """
+        Domoticz.Log(f"Add devices for car {name} with base index {base}")
 
+        dev=DEVS['EVSTATE']; var=v.ev_battery_is_charging
+        if var != None and base+dev[0] not in Devices: 
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=19, Used=1).Create()
+
+        dev=DEVS['EVBATTLEVEL']; var=v.ev_battery_percentage
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=6, Used=1).Create()
+
+        dev=DEVS['EVRANGE']; var=v.ev_driving_distance
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._ev_driving_distance_unit}, Used=1).Create()
+
+        dev=DEVS['FUELLEVEL']; var=v.fuel_level
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=6, Used=1).Create()
+
+        dev=DEVS['FUELRANGE']; var=v.fuel_driving_distance
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._fuel_driving_distance_unit}, Used=1).Create()
+
+        dev=DEVS['ENGINEON']; var=v.engine_is_running
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=73, Used=1).Create()
+
+        dev=DEVS['ODOMETER']; var=v.odometer
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=113, Subtype=0, Switchtype=3, Used=1).Create()
+        # TODO: LOCATION
+
+        # TODO: HOMEDIST
+
+        dev=DEVS['SPEED']; var=v.data
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=31, Used=1).Create()
+        
+        dev=DEVS['UPDATE']
+        if base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=73, Used=1).Create() 
+
+        # TODO: TEMPSET (thermostat)
+
+        dev=DEVS['CLIMAON']; var=v.air_control_is_on
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=73, Used=1).Create()
+
+        dev=DEVS['DEFROSTON']; var=v.defrost_is_on
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=73, Used=1).Create()
+
+        dev=DEVS['REARWINDOWON']; var=v.back_window_heater_is_on
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=73, Used=1).Create()
+
+        dev=DEVS['STEERINGWHEELON']; var=v.steering_wheel_heater_is_on
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=73, Used=1).Create()
+
+        dev=DEVS['SIDEMIRRORSON']; var=v.side_mirror_heater_is_on
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=73, Used=1).Create()
+
+        dev=DEVS['SEATFL']; var=v.front_left_seat_status
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=19, Used=1).Create()
+
+        dev=DEVS['SEATFR']; var=v.front_right_seat_status
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=19, Used=1).Create()
+
+        dev=DEVS['SEATRL']; var=v.rear_left_seat_status
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=19, Used=1).Create()
+
+        dev=DEVS['SEATRR']; var=v.rear_right_seat_status
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=19, Used=1).Create()
+
+        dev=DEVS['OPEN']; var=v.is_locked
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=73, Switchtype=19, Used=1).Create()
+
+        dev=DEVS['TRUNK']; var=v.trunk_is_open
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=73, Switchtype=11, Used=1).Create()
+
+        dev=DEVS['HOOD']; var=v.hood_is_open
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=73, Switchtype=11, Used=1).Create()
+
+        dev=DEVS['12VBATT']; var=v.car_battery_percentage
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=6, Used=1).Create()
+
+        dev=DEVS['KEYBATT']; var=v.smart_key_battery_warning_is_on
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=22, Used=1).Create()
+
+        dev=DEVS['WASHER']; var=v.washer_fluid_warning_is_on
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=6, Used=1).Create()
+
+        dev=DEVS['BRAKE']; var=v.brake_fluid_warning_is_on
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=6, Used=1).Create()
+
+        dev=DEVS['TIRES']; var=v.tire_pressure_all_warning_is_on
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=6, Used=1).Create()
+
+    def updateDevices(self, base, name, v):
+        """ Update devices for car named {name}, starting from base unit {base}, using vehicle parameters in {v} """
+        Domoticz.Log(f"Car found at base {base}")
+
+        if v.ev_battery_is_charging != None:
+            nValue=0
+            sValue="Disconnected"
+            if v.ev_battery_is_charging:
+                nValue=1
+                sValue="Charging"
+                self._isCharging=True
+            elif v.ev_battery_is_plugged_in:
+                nValue=1
+                sValue="Connected"
+            Devices[base+DEVS['EVSTATE'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        if v.ev_battery_percentage != None:
+            nValue=v.ev_battery_percentage
+            Devices[base+DEVS['EVBATTLEVEL'][0]].Update(nValue=nValue, sValue=str(nValue))
+        
+        nValue=v.ev_driving_distance
+        if nValue != None:
+            Devices[base+DEVS['EVRANGE'][0]].Update(nValue=nValue, sValue=str(nValue))
+        
+        nValue=v.fuel_level
+        if nValue != None:
+            Devices[base+DEVS['FUELLEVEL'][0]].Update(nValue=nValue, sValue=str(nValue))
+        
+        nValue=v.fuel_driving_distance
+        if nValue != None:
+            Devices[base+DEVS['FUELRANGE'][0]].Update(nValue=nValue, sValue=str(nValue))
+        
+        value=v.engine_is_running
+        if value != None:
+            nValue=0; sValue="Off"
+            if (value):
+                nValue=1; sValue="On"
+                self._engineOn=True
+            Devices[base+DEVS['ENGINEON'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        nValue=v.odometer
+        if nValue != None:
+            nValue=int(nValue)
+            Devices[base+DEVS['ODOMETER'][0]].Update(nValue=nValue, sValue=str(v.odometer))
+        # TODO: LOCATION
+
+        # TODO: HOMEDIST
+
+        value=v.data
+        if value != None:
+            nValue=value['vehicleLocation']['speed']['value']
+            sValue=str(nValue)
+            Devices[base+DEVS['SPEED'][0]].Update(nValue=nValue, sValue=sValue)
+
+        # Reset force update button
+        Devices[base+DEVS['UPDATE'][0]].Update(nValue=0, sValue="Off")
+        
+        value=v.air_control_is_on
+        if value != None:
+            nValue=1 if value else 0
+            sValue="On" if value else "Off"
+            Devices[base+DEVS['CLIMAON'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        value=v.defrost_is_on
+        if value != None:
+            nValue=1 if value else 0
+            sValue="On" if value else "Off"
+            Devices[base+DEVS['DEFROSTON'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        value=v.back_window_heater_is_on
+        if value != None:
+            nValue=value
+            sValue="On" if value>0 else "Off"
+            Devices[base+DEVS['REARWINDOWON'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        value=v.steering_wheel_heater_is_on
+        if value != None:
+            nValue=value
+            sValue="On" if value>0 else "Off"
+            Devices[base+DEVS['STEERINGWHEELON'][0]].Update(nValue=nValue, sValue=sValue)
+
+        value=v.side_mirror_heater_is_on
+        if value != None:
+            nValue=1 if value else 0
+            sValue="On" if value else "Off"
+            Devices[base+DEVS['SIDEMIRRORSON'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        sValue=v.front_left_seat_status
+        if sValue != None:
+            Devices[base+DEVS['SEATFL'][0]].Update(nValue=0, sValue=sValue)
+        
+        sValue=v.front_right_seat_status
+        if sValue != None:
+            Devices[base+DEVS['SEATFR'][0]].Update(nValue=0, sValue=sValue)
+        
+        sValue=v.rear_left_seat_status
+        if sValue != None:
+            Devices[base+DEVS['SEATRL'][0]].Update(nValue=0, sValue=sValue)
+       
+        sValue=v.rear_right_seat_status
+        if sValue != None:
+            Devices[base+DEVS['SEATRR'][0]].Update(nValue=0, sValue=sValue)
+        
+        value=v.is_locked
+        if value != None:
+            nValue=0 if value else 1
+            sValue="Locked" if value else "Unlocked"
+            Devices[base+DEVS['OPEN'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        value=v.trunk_is_open
+        if value != None:
+            nValue=1 if value else 0
+            sValue="Open" if value else "Closed"
+            Devices[base+DEVS['TRUNK'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        value=v.hood_is_open
+        if value != None:
+            nValue=1 if value else 0
+            sValue="Open" if value else "Closed"
+            Devices[base+DEVS['HOOD'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        nValue=v.car_battery_percentage
+        if nValue != None:
+            sValue=str(nValue)
+            Devices[base+DEVS['12VBATT'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        nValue=v.smart_key_battery_warning_is_on
+        if nValue != None:
+            sValue="Ok" if nValue == 0 else "Low"
+            Devices[base+DEVS['KEYBATT'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        nValue=v.washer_fluid_warning_is_on
+        if nValue != None:
+            sValue="Ok" if nValue == 0 else "Empty"
+            Devices[base+DEVS['WASHER'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        nValue=v.brake_fluid_warning_is_on
+        if nValue != None:
+            sValue="Ok" if nValue == 0 else "Empty"
+            Devices[base+DEVS['BRAKE'][0]].Update(nValue=nValue, sValue=sValue)
+        
+        nValue=v.tire_pressure_all_warning_is_on
+        if nValue != None:
+            sValue="Ok" if nValue == 0 else "Low"
+            Devices[base+DEVS['TIRES'][0]].Update(nValue=nValue, sValue=sValue)
 
 
 ####################################################################################
@@ -353,3 +462,7 @@ def onStart():
 def onHeartbeat():
     global _plugin
     _plugin.onHeartbeat()
+
+def onCommand(Unit, Command, Level, Hue):
+    global _plugin
+    _plugin.onCommand(Unit, Command, Level, Hue)
