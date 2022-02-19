@@ -142,11 +142,14 @@ class BasePlugin:
 
     def onHeartbeat(self):
         """ Called every 10 seconds or other interval set by Domoticz.Heartbeat() """
+        Domoticz.Log(f"Vehicles: _isCharging={self._isCharging} _engineOn={self._engineOn}")
         if self.mustPoll():   # check if vehicles data should be polled 
             ret=self.vm.check_and_refresh_token()
             Domoticz.Log(f"self.vm.check_and_refresh_token() returned {ret}")
-            ret=self.vm.update_all_vehicles_with_cached_state()
-            Domoticz.Log(f"self.vm.update_all_vehicles_with_cached_state() returned {ret}")
+            #ret=self.vm.update_all_vehicles_with_cached_state()
+            #Domoticz.Log(f"self.vm.update_all_vehicles_with_cached_state() returned {ret}")
+            ret=self.vm.force_refresh_all_vehicles_states()
+            Domoticz.Log(f"self.vm.force_refresh_all_vehicles_states() returned {ret}")
             self.updatePollInterval()
             self._isCharging=False  # set to false: if one vehicle is charging, this flag will be set by updateDevices()
             self._engineOn=False    # set to false: if one vehicle is moving,   this flag will be set by updateDevices()
@@ -322,7 +325,7 @@ class BasePlugin:
                 nValue=1
                 sValue="Charging"
                 self._isCharging=True
-            elif v.ev_battery_is_plugged_in:
+            elif v.ev_battery_is_plugged_in>0:
                 nValue=1
                 sValue="Connected"
             Devices[base+DEVS['EVSTATE'][0]].Update(nValue=nValue, sValue=sValue)

@@ -61,3 +61,5 @@ Features:
 
 More info at https://www.creasol.it/en/support/domotics-home-automation-and-diy/155-smart-electric-vehicle-charging
 
+[![alt Kia car panel, in Domoticz, with some controls to charge the EV car by Creasol DomBusEVSE](https://images.creasol.it/kia_domoticz2.webp "Kia car panel, in Domoticz, with some controls to charge the EV car by Creasol DomBusEVSE")](https://www.creasol.it/domotics)
+
