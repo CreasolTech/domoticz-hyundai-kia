@@ -58,9 +58,9 @@
 
 import Domoticz as Domoticz
 import json
-
-from datetime import datetime, timedelta
-from enum import IntEnum, unique, auto
+from math import cos, asin, sqrt, pi
+import requests
+from datetime import datetime
 from hyundai_kia_connect_api import *
 
 
@@ -110,6 +110,7 @@ class BasePlugin:
         self._isCharging = False  
         self._engineOn = False
         self._lang = "en"
+        self._vehicleLoc = {}           # saved location for vehicles
         self.vm = None
 
     def mustPoll(self):
@@ -224,7 +225,13 @@ class BasePlugin:
             Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=113, Subtype=0, Switchtype=3, Used=1).Create()
         # TODO: LOCATION
 
-        # TODO: HOMEDIST
+        dev=DEVS['LOCATION']; var=v.location_latitude
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=19, Used=1).Create()
+        
+        dev=DEVS['HOMEDIST']; var=v.location_latitude
+        if var != None and base+dev[0] not in Devices:
+            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=243, Subtype=31, Used=1).Create()
 
         dev=DEVS['SPEED']; var=v.data
         if var != None and base+dev[0] not in Devices:
@@ -348,15 +355,30 @@ class BasePlugin:
         if nValue != None:
             nValue=int(nValue)
             Devices[base+DEVS['ODOMETER'][0]].Update(nValue=nValue, sValue=str(v.odometer))
-        # TODO: LOCATION
+        
+        if (v.location_latitude != None and (name not in self._vehicleLoc or (v.location_latitude!=self._vehicleLoc[name]['latitude'] and v.location_longitude!=self._vehicleLoc[name]['longitude']))):
+            # LOCATION changed or not previously set
+            # get address
+            get_address_url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&lat=' + str(v.location_latitude) + '&lon=' + str(v.location_longitude)
+            response = requests.get(get_address_url)
+            if response.status_code == 200:
+                response = json.loads(response.text)
+                locAddr=response['display_name']
+                locMap = '<a href="http://www.google.com/maps/search/?api=1&query=' + str(v.location_latitude) + ',' + str(v.location_longitude) + '" target="_new"><em style="color:blue;">Map</em></a>'
+                sValue=locAddr + ' ' + locMap
+                Domoticz.Log(f"Location address: {sValue}")
+                Devices[base+DEVS['LOCATION'][0]].Update(nValue=0, sValue=sValue)
 
-        # TODO: HOMEDIST
+            # HOME DISTANCE: compute distance from home
+            homeloc=Settings['Location'].split(';')
+            distance=round(self.distance(v.location_latitude, v.location_longitude, float(homeloc[0]), float(homeloc[1])), 1)
+            Devices[base+DEVS['HOMEDIST'][0]].Update(nValue=0, sValue=str(distance))
 
-        value=v.data
-        if value != None:
-            nValue=value['vehicleLocation']['speed']['value']
-            sValue=str(nValue)
-            Devices[base+DEVS['SPEED'][0]].Update(nValue=nValue, sValue=sValue)
+            value=v.data
+            if value != None:
+                nValue=value['vehicleLocation']['speed']['value']
+                sValue=str(nValue)
+                Devices[base+DEVS['SPEED'][0]].Update(nValue=nValue, sValue=sValue)
 
         # Reset force update button
         Devices[base+DEVS['UPDATE'][0]].Update(nValue=0, sValue="Off")
@@ -450,6 +472,11 @@ class BasePlugin:
             sValue="Ok" if nValue == 0 else "Low"
             Devices[base+DEVS['TIRES'][0]].Update(nValue=nValue, sValue=sValue)
 
+    def distance(self, lat1, lon1, lat2, lon2):
+        """ Compute the distance between two locations """
+        p = pi / 180
+        a = 0.5 - cos((lat2 - lat1) * p) / 2 + cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2
+        return 12742 * asin(sqrt(a))
 
 ####################################################################################
 global _plugin
