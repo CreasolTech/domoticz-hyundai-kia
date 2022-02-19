@@ -10,7 +10,11 @@ This plugin is designed for [Domoticz](https://www.domoticz.com) home automation
 
 It's based on the [hyundai-kia-connect-api](https://pypi.org/project/hyundai-kia-connect-api/) python library, written by Fuat Akgun.  
 
-In this folder you can find the python plugin for Domoticz: **you can install the hardware plugin by using Python Plugin Manager, or typing the following commands from the linux shell**:
+Using this plugin is possible to monitor the battery state of charge (for electric cars), that lead to the ability to enable / disable charging based on the power availability from photovoltaic, for example, improving the own-consumption. 
+
+Also it works with non-EV cars from Hyundai and Kia, monitoring the fuel level and range, climate, location, vehicle sensors, ....
+
+This plugin **can install the hardware plugin by using Python Plugin Manager, or typing the following commands from the linux shell**:
 
 # Installation
 
@@ -37,6 +41,8 @@ pip3 install hyundai-kia-connect-api
 #restart Domoticz daemon
 service domoticz restart
 ```
+
+Then, enter Domoticz panel, go to Setup -> Hardware and enable the Hyundai Kia connect plugin specifying the Hyundai or Kia account credential: up to 4 vehicles associated to this account can be shown automatically on Domoticz.
 
 # Charging the electric car in a smart way
 
