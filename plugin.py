@@ -10,7 +10,7 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.0.0" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia.git">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.0.1" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
         <h2>Domoticz Hyundai Kia connect plugin</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about owned Hyundai and Kia vehicles, such as odometer, EV battery charge, 
@@ -37,14 +37,17 @@
         </param>
         <param field="Mode1" label="Poll interval">
             <options>
+                <option label="10 minutes" value="10" />
+                <option label="20 minutes" value="20" />
                 <option label="30 minutes" value="30" />
                 <option label="60 minutes" value="60" />
                 <option label="120 minutes" value="120" default="true" />
                 <option label="240 minutes" value="240" />
             </options>
         </param>
-        <param field="Mode2" label="Poll interval while charging">
+        <param field="Mode2" label="Poll interval while charging or driving">
             <options>
+                <option label="5 minutes" value="5" />
                 <option label="10 minutes" value="10" />
                 <option label="20 minutes" value="20" />
                 <option label="30 minutes" value="30" default="true" />
@@ -58,6 +61,8 @@
 
 import Domoticz as Domoticz
 import json
+import re
+import logging
 from math import cos, asin, sqrt, pi
 import requests
 from datetime import datetime
@@ -111,6 +116,7 @@ class BasePlugin:
         self._engineOn = False
         self._lang = "en"
         self._vehicleLoc = {}           # saved location for vehicles
+        self._name2id = {}
         self.vm = None
 
     def mustPoll(self):
@@ -118,7 +124,13 @@ class BasePlugin:
         if self._lastPoll == None: 
             return True
         elapsedTime = int( (datetime.now()-self._lastPoll).total_seconds() / 60)  # time in minutes
-        if (elapsedTime >= self._pollInterval or ((self._isCharging or self._engineOn) and elapsedTime >= self._pollIntervalCharging)): 
+        interval = self._pollInterval
+        if self._isCharging or self._engineOn:
+            interval = self._pollIntervalCharging   # while charging or driving, reduce the poll interval
+        elif datetime.now().hour>=22 or datetime.now().hour<6:
+            interval*=4     # reduce polling during the night
+            if interval > 120: interval = 120
+        if elapsedTime >= interval: 
             return True
         return False
 
@@ -138,7 +150,10 @@ class BasePlugin:
         self._pollInterval = float(Parameters["Mode1"])
         self._pollIntervalCharging = float(Parameters["Mode2"])
         self.vm = VehicleManager(region=int(Parameters["Address"]), brand=int(Parameters["Port"]), username=Parameters["Username"], password=Parameters["Password"], pin=Parameters["Mode3"])
-        self._lastPoll = None   # force reconnecting in 10 seconds
+        #self._lastPoll = None   # force reconnecting in 10 seconds #TODO
+        self._lastPoll = datetime.now() # do not reconnect in 10 seconds, to avoid daily connection exceeding during testing #DEBUG 
+        
+        logging.basicConfig(filename='/tmp/domoticz_hyundai_kia.log', encoding='utf-8', level=logging.DEBUG)
 
     def onHeartbeat(self):
         """ Called every 10 seconds or other interval set by Domoticz.Heartbeat() """
@@ -146,10 +161,10 @@ class BasePlugin:
         if self.mustPoll():   # check if vehicles data should be polled 
             ret=self.vm.check_and_refresh_token()
             Domoticz.Log(f"self.vm.check_and_refresh_token() returned {ret}")
-            #ret=self.vm.update_all_vehicles_with_cached_state()
-            #Domoticz.Log(f"self.vm.update_all_vehicles_with_cached_state() returned {ret}")
             ret=self.vm.force_refresh_all_vehicles_states()
             Domoticz.Log(f"self.vm.force_refresh_all_vehicles_states() returned {ret}")
+            ret=self.vm.update_all_vehicles_with_cached_state()
+            Domoticz.Log(f"self.vm.update_all_vehicles_with_cached_state() returned {ret}")
             self.updatePollInterval()
             self._isCharging=False  # set to false: if one vehicle is charging, this flag will be set by updateDevices()
             self._engineOn=False    # set to false: if one vehicle is moving,   this flag will be set by updateDevices()
@@ -157,8 +172,10 @@ class BasePlugin:
             for k in self.vm.vehicles:
                 # k is the keyword associated to a Vehicle object
                 v = self.vm.get_vehicle(k)
-                name = v.name   # must be unique and identify the type of car, if more than 1 car is owned
-                Domoticz.Log(f"Name={v.name} Odometer={v._odometer_value}{v._odometer_unit} Battery={v.ev_battery_percentage}")
+                name = re.sub(r'\W+', '', v.name)   # must be unique and identify the type of car, if more than 1 car is owned
+                if name not in self._name2id:
+                    self._name2id[name]=k   # save the corresponding between vehicle name and id in vm.vehicles dict
+                Domoticz.Log(f"Name={name} Odometer={v._odometer_value}{v._odometer_unit} Battery={v.ev_battery_percentage}")
                 Domoticz.Log(f"Vehicle={v}")
             
                 # base = Unit base = 0, 32, 64, 96  # up to 4 vehicle can be addressed, 32 devices per vehicle (Unit <= 255)
@@ -193,6 +210,32 @@ class BasePlugin:
                 self._checkDevices = True
                 self._lastPoll = None
                 self.onHeartbeat()
+        else:
+            # get name and id for the vehicle
+            Domoticz.Log(f"Device Name={Devices[Unit].Name}")
+            name=re.findall(f"{Parameters['Name']} - ([a-zA-Z0-9-_]+) .*", Devices[Unit].Name)[0]
+            vehicleId = False
+            if name in self._name2id:
+                vehicleId=self._name2id[name]
+            Domoticz.Log(f"name={name} vehicleId={vehicleId}")
+            if (Unit&31) == DEVS["CLIMAON"][0]:   # start/stop climate control
+                if Command == "On":
+                    ret=self.vm.start_climate(vehicleId, {'set_temp': 25, 'heating': 1, 'defrost': 1})
+                    Domoticz.Log(f"start_climate() returned {ret}")
+                    Devices[Unit].Update(nValue=1, sValue="On")
+                else:   # Off command
+                    ret=self.vm.stop_climate(vehicleId)
+                    Domoticz.Log(f"stop_climate() returned {ret}")
+                    Devices[Unit].Update(nValue=0, sValue="Off")
+            elif (Unit&31) == DEVS["OPEN"][0]:   # open/close
+                if Command == "On": # open
+                    ret=self.vm.unlock(vehicleId)
+                    Domoticz.Log(f"unlock() returned {ret}")
+                    Devices[Unit].Update(nValue=1, sValue="On")
+                else:   # Off command
+                    ret=self.vm.lock(vehicleId)
+                    Domoticz.Log(f"lock() returned {ret}")
+                    Devices[Unit].Update(nValue=0, sValue="Off")
 
 
     def addDevices(self, base, name, v):

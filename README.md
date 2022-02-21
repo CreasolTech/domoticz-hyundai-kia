@@ -44,6 +44,8 @@ service domoticz restart
 
 Then, enter Domoticz panel, go to Setup -> Hardware and enable the Hyundai Kia connect plugin specifying the Hyundai or Kia account credential: up to 4 vehicles associated to this account can be shown automatically on Domoticz.
 
+Please note that there are some restrictions on the number of daily access to the cloud... for example EU customers cannot connect more than 200 times/day
+
 # Charging the electric car in a smart way
 
 Creasol is developing a __cheap and smart DIY EVSE module__ that can work stand-alone or connected to Domoticz.
