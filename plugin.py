@@ -110,6 +110,7 @@ class BasePlugin:
     def __init__(self):
         self._pollInterval = 120        # fetch data every 120 minutes, by default (but check parameter Mode1!)
         self._pollIntervalCharging = 30 # while charging, fetch data quickly 
+        self.interval = 10              # current polling interval (depending by charging, moving, night time, ...) It's set by mustPoll()
         self._lastPoll = None           # last time I got vehicle status
         self._checkDevices = True       # if True, check that all devices are created (at startup and when update is forced)
         self._isCharging = False  
@@ -124,13 +125,13 @@ class BasePlugin:
         if self._lastPoll == None: 
             return True
         elapsedTime = int( (datetime.now()-self._lastPoll).total_seconds() / 60)  # time in minutes
-        interval = self._pollInterval
+        self.interval = self._pollInterval
         if self._isCharging or self._engineOn:
-            interval = self._pollIntervalCharging   # while charging or driving, reduce the poll interval
+            self.interval = self._pollIntervalCharging   # while charging or driving, reduce the poll interval
         elif datetime.now().hour>=22 or datetime.now().hour<6:
-            interval*=4     # reduce polling during the night
-            if interval > 120: interval = 120
-        if elapsedTime >= interval: 
+            self.interval*=4     # reduce polling during the night
+            if self.interval > 120: self.interval = 120
+        if elapsedTime >= self.interval: 
             return True
         return False
 
@@ -153,16 +154,18 @@ class BasePlugin:
         #self._lastPoll = None   # force reconnecting in 10 seconds #TODO
         self._lastPoll = datetime.now() # do not reconnect in 10 seconds, to avoid daily connection exceeding during testing #DEBUG 
         
-        logging.basicConfig(filename='/tmp/domoticz_hyundai_kia.log', encoding='utf-8', level=logging.DEBUG)
+        #logging.basicConfig(filename='/tmp/domoticz_hyundai_kia.log', encoding='utf-8', level=logging.DEBUG)
+        logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.DEBUG)
 
     def onHeartbeat(self):
         """ Called every 10 seconds or other interval set by Domoticz.Heartbeat() """
-        Domoticz.Log(f"Vehicles: _isCharging={self._isCharging} _engineOn={self._engineOn}")
         if self.mustPoll():   # check if vehicles data should be polled 
             ret=self.vm.check_and_refresh_token()
             Domoticz.Log(f"self.vm.check_and_refresh_token() returned {ret}")
             ret=self.vm.force_refresh_all_vehicles_states()
             Domoticz.Log(f"self.vm.force_refresh_all_vehicles_states() returned {ret}")
+#            ret=self.vm.check_and_force_update_vehicles(self.interval)
+#            Domoticz.Log(f"self.vm.check_and_force_update_vehicles({self.interval}) returned {ret}")
             ret=self.vm.update_all_vehicles_with_cached_state()
             Domoticz.Log(f"self.vm.update_all_vehicles_with_cached_state() returned {ret}")
             self.updatePollInterval()
@@ -197,7 +200,7 @@ class BasePlugin:
                 if base < 256:
                     # car found or just created: update values
                     if self._checkDevices == True: self.addDevices(base, name, v)
-                    self.updateDevices(base, name, v)    
+                    self.updateDevices(base, name, v)
             self._checkDevices=False
 
     def onCommand(self, Unit, Command, Level, Hue):
@@ -400,6 +403,10 @@ class BasePlugin:
         nValue=v.odometer
         if nValue != None:
             nValue=int(nValue)
+            if (nValue != Devices[base+DEVS['ODOMETER'][0]].nValue):
+                # odometer has changed => request new location
+                if hasattr(self.vm, "get_location"): # check that method exists
+                    self.vm.get_location(self._name2id[name])
             Devices[base+DEVS['ODOMETER'][0]].Update(nValue=nValue, sValue=str(v.odometer))
         
         if (v.location_latitude != None and (name not in self._vehicleLoc or (v.location_latitude!=self._vehicleLoc[name]['latitude'] and v.location_longitude!=self._vehicleLoc[name]['longitude']))):

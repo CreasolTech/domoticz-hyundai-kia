@@ -46,6 +46,17 @@ Then, enter Domoticz panel, go to Setup -> Hardware and enable the Hyundai Kia c
 
 Please note that there are some restrictions on the number of daily access to the cloud... for example EU customers cannot connect more than 200 times/day
 
+
+
+# Features
+* It's possible to configure 2 polling intervals, to limit accesses to the cloud (Kia Europe limit is 200 accesses/day): a standard interval, a shorter interval when charging or moving (to track battery and position/speed), and a longer interval during the night computed as 4x polling interval, max 120 minutes).
+
+* Permits to monitor all variables provided by the API
+
+* Also, permits to monitor the distance from home and have a map and address of the car location.
+
+
+
 # Charging the electric car in a smart way
 
 Creasol is developing a __cheap and smart DIY EVSE module__ that can work stand-alone or connected to Domoticz.
