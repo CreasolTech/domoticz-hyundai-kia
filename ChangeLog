@@ -2,6 +2,8 @@ domoticz-hyundai-kia plugin
 ChangeLog
 
 20220223 1.0.1
+Modified poll interval during the night.
+Activated logging from the API
 
 20220219 1.0.0
 First version
