@@ -1,6 +1,9 @@
 domoticz-hyundai-kia plugin
 ChangeLog
 
+20220406 1.0.2
+Added start/stop climate, and thermostat setpoint to set the climate temperature
+
 20220223 1.0.1
 Modified poll interval during the night.
 Activated logging from the API
