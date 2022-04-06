@@ -14,7 +14,7 @@ Using this plugin is possible to monitor the battery state of charge (for electr
 
 Also it works with non-EV cars from Hyundai and Kia, monitoring the fuel level and range, climate, location, vehicle sensors, ....
 
-This plugin **can install the hardware plugin by using Python Plugin Manager, or typing the following commands from the linux shell**:
+This plugin works with **Domoticz Beta** (it does not work with Stable 2022.1, if the installed python version is 3.9.3) and can be installed typing the following commands from a shell: instead of installing the plugin, (penultimate command),  **it's possible to use Python Plugin Manager**:
 
 # Installation
 
@@ -32,11 +32,16 @@ cd /home/pi/domoticz/plugins
 #fetch the Python Plugin Manager (that can be used to install/upgrade other plugins, including domoticz-hyundai-kia)
 git clone https://github.com/ycahome/pp-manager
 
-#fetch Creasol Plugin
-git clone https://github.com/CreasolTech/domoticz-hyundai-kia
+#install python3-dateutil
+sudo apt install python3-dateutil
 
 #install hyundai-kia-connect-api lib
 pip3 install hyundai-kia-connect-api
+#remove __pycache__ dir from the lib (it contains the __pycache__ with sources compiled by a different python version or different CPU)
+for d in /usr/local/lib/python3*; do find $d -name __pycache__ -exec rm -r {} \; ; done
+
+#fetch Creasol Plugin
+git clone https://github.com/CreasolTech/domoticz-hyundai-kia
 
 #restart Domoticz daemon
 service domoticz restart
