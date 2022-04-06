@@ -152,8 +152,8 @@ class BasePlugin:
         self._pollInterval = float(Parameters["Mode1"])
         self._pollIntervalCharging = float(Parameters["Mode2"])
         self.vm = VehicleManager(region=int(Parameters["Address"]), brand=int(Parameters["Port"]), username=Parameters["Username"], password=Parameters["Password"], pin=Parameters["Mode3"])
-        #self._lastPoll = None   # force reconnecting in 10 seconds #TODO
-        self._lastPoll = datetime.now() # do not reconnect in 10 seconds, to avoid daily connection exceeding during testing #DEBUG 
+        self._lastPoll = None   # force reconnecting in 10 seconds 
+        #self._lastPoll = datetime.now() # do not reconnect in 10 seconds, to avoid daily connection exceeding during testing #DEBUG 
         
         #logging.basicConfig(filename='/tmp/domoticz_hyundai_kia.log', encoding='utf-8', level=logging.DEBUG)
         logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.DEBUG)
