@@ -14,7 +14,9 @@ Using this plugin is possible to monitor the battery state of charge (for electr
 
 Also it works with non-EV cars from Hyundai and Kia, monitoring the fuel level and range, climate, location, vehicle sensors, ....
 
-This plugin works with **Domoticz Beta** (it may not work with Stable 2022.1 or older versions) and can be installed typing the following commands from a shell: instead of installing the plugin, (penultimate command),  **it's possible to use Python Plugin Manager**:
+Actually 30 devices will be created, using the same language of Domoticz: only English, Italian and Dutch are supported, now, but if you want to contribute, just fetch the translation.txt file, add for each line the translation in your language, and send by email to linux AT creasol dot it.
+
+This plugin works with **Domoticz Beta** (it may not work with Stable 2022.1 or older versions: please advice) and can be installed typing the following commands from a shell: instead of installing the plugin, (penultimate command),  **it's possible to use Python Plugin Manager or Python Plugins Manager** which also permit to update plugin easily or even automatically:
 
 # Installation
 
@@ -74,14 +76,14 @@ Features:
 * detects alarms from vehicle
 * interfaces a bidirectional energy meter to know the real time import or export power from grid
 * operates as __stand-alone__ (no need for a domotic controller) with the possibility to select two charging mode:
-    1. __use the maximum power allowed by electricity meter__, preventing overloads and disconnections
+    1. __use the maximum power allowed by electricity meter__, preventing overloads and disconnections, without exceeding the power supported by the charging cable
     2. __use only renewable energy (keep import power around 0W)__
 
 * operates in a __controlled mode, with Domoticz__ home automation system: in this case it's possible to 
 	1. easily set the __minimum and maximum battery level__
 	2. easily set the __maximum charging current__
 	3. __when battery level is below minimum, charge at the max power__ permitted by the electricity meter (in Italy, alternates 90 minutes at maximum power + 27% and 90 minutes at maximum power + 10%, ___it's not possible to charge faster!___ The electrical system must be checked carefully when using maximum power, to avoid overheating and fires!!)
-	4. __when battery level is between minimum and maximum, charge using only power from renewable energy from photovoltaic__
+	4. __when battery level is between minimum and maximum, charge using only power from renewable energy__ (from photovoltaic) keeping 0W imported from the grid.
 
 More info at https://www.creasol.it/en/support/domotics-home-automation-and-diy/155-smart-electric-vehicle-charging
 
