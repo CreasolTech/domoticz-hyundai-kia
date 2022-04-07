@@ -14,7 +14,7 @@ Using this plugin is possible to monitor the battery state of charge (for electr
 
 Also it works with non-EV cars from Hyundai and Kia, monitoring the fuel level and range, climate, location, vehicle sensors, ....
 
-This plugin works with **Domoticz Beta** (it does not work with Stable 2022.1, if the installed python version is 3.9.3) and can be installed typing the following commands from a shell: instead of installing the plugin, (penultimate command),  **it's possible to use Python Plugin Manager**:
+This plugin works with **Domoticz Beta** (it may not work with Stable 2022.1 or older versions) and can be installed typing the following commands from a shell: instead of installing the plugin, (penultimate command),  **it's possible to use Python Plugin Manager**:
 
 # Installation
 
