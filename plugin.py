@@ -69,41 +69,43 @@ from datetime import datetime
 from hyundai_kia_connect_api import *
 
 
-LANGS=[ "en", "it", "nl" ] # list of supported languages, in DEVS dict below
+LANGS=[ "en", "it", "nl", "se" ] # list of supported languages, in DEVS dict below
 LANGBASE=1  # item in the DEVS list where the first language starts 
 
 #Dutch translation by Branko
-DEVS={ #topic:      [ num, "en name", "it name", ...other languages defined in LANGS[] ],
-    "EVSTATE":      [ 1, "EV state", "EV stato", "EV status" ],
-    "EVBATTLEVEL":  [ 2, "EV battery level", "EV livello batteria", "batterijniveau" ],
-    "EVRANGE":      [ 3, "EV range", "EV autonomia", "EV bereik" ],
-    "FUELLEVEL":    [ 4, "fuel level", "livello carburante", "brandstofniveau" ],
-    "FUELRANGE":    [ 5, "fuel range", "autonomia carburante", "brandstof bereik" ],
-    "ENGINEON":     [ 6, "engine ON", "motore acceso", "motor aan" ],
-    "ODOMETER":     [ 7, "odometer", "contachilometri", "kilometerteller" ],
-    "LOCATION":     [ 8, "location", "posizione", "locatie" ],
-    "HOMEDIST":     [ 9, "distance", "distanza", "afstand" ],
-    "SPEED":        [ 10, "speed", "velocità", "snelheid" ],
-    "UPDATE":       [ 11, "update req.", "aggiorna", "bijwerken" ],
-    "TEMPSET":      [ 12, "temp. settings", "imp. temperatura", "temperatuur inst." ],
-    "CLIMAON":      [ 13, "climate", "clima acceso", "airco" ],
-    "DEFROSTON":    [ 14, "defrost", "scongelamento", "ontdooien" ],
-    "REARWINDOWON": [ 15, "rear window", "lunotto termico", "achterruitverwarming" ],
-    "STEERINGWHEELON": [ 16, "steering wheel", "volante termico", "stuurverwarming" ],
-    "SIDEMIRRORSON":[ 17, "side mirrors", "specchietti termici", "zijspiegel verwarming" ],
-    "SEATFL":       [ 18, "seat front-left", "sedile guidatore", "bestuurdersstoel" ],
-    "SEATFR":       [ 19, "seat front-right", "sedile passeggero", "bijrijdersstoel" ],
-    "SEATRL":       [ 20, "seat rear-left", "sedile post.sx", "achterbank links" ],
-    "SEATRR":       [ 21, "seat rear-right", "sedile post.dx", "achterbank rechts" ],
-    "OPEN":         [ 22, "open", "aperta", "open" ],
-    "TRUNK":        [ 23, "trunk open", "bagagliaio aperto", "kofferbak"],
-    "HOOD":         [ 24, "hood open", "cofano aperto", "motorkap"],
-    "12VBATT":      [ 25, "12V battery", "batteria 12V", "12V batterij"],
-    "KEYBATT":      [ 26, "key battery", "batteria radiocomando", "batterij afstandsbediening"],
-    "WASHER":       [ 27, "washer fluid", "liquido tergicristallo", "ruitensproeiervloeistof" ],
-    "BRAKE":        [ 28, "brake fluid", "olio freni", "rem" ],
-    "TIRES":        [ 29, "tyre pressure", "pressione gomme", "bandenspanning" ],
-    "CLIMATEMP":    [ 30, "climate temperature", "temperatura clima", "airco temperatuur" ],
+#Svedish translation by Joakim W.
+#If you want to add another language, please add, for each line:     , "your translation"
+DEVS={ #topic:      [ num, "en name", "it name", "nl name", "se name"  , other languages should follow  ],
+    "EVSTATE":      [ 1, "EV state", "EV stato", "EV status", "EV status" ]
+    "EVBATTLEVEL":  [ 2, "EV battery level", "EV livello batteria", "batterijniveau", "EV batterinivå" ],
+    "EVRANGE":      [ 3, "EV range", "EV autonomia", "EV bereik" , "EV räckvidd" ],
+    "FUELLEVEL":    [ 4, "fuel level", "livello carburante", "brandstofniveau", "bränslenivå" ],
+    "FUELRANGE":    [ 5, "fuel range", "autonomia carburante", "brandstof bereik", "bränsleräckvidd" ],
+    "ENGINEON":     [ 6, "engine ON", "motore acceso", "motor aan", "motor på" ],
+    "ODOMETER":     [ 7, "odometer", "contachilometri", "kilometerteller" "odometer" ],
+    "LOCATION":     [ 8, "location", "posizione", "locatie", "plats" ],
+    "HOMEDIST":     [ 9, "distance", "distanza", "afstand", "avstånd" ],
+    "SPEED":        [ 10, "speed", "velocità", "snelheid", "hastighet" ],
+    "UPDATE":       [ 11, "update req.", "aggiorna", "bijwerken", "uppdatering" ],
+    "TEMPSET":      [ 12, "temp. settings", "imp. temperatura", "temperatuur inst.", "temperatur" ],
+    "CLIMAON":      [ 13, "climate", "clima acceso", "airco", "klimat" ],
+    "DEFROSTON":    [ 14, "defrost", "scongelamento", "ontdooien", "defrost" ],
+    "REARWINDOWON": [ 15, "rear window", "lunotto termico", "achterruitverwarming", "bakrutevärme" ],
+    "STEERINGWHEELON": [ 16, "steering wheel", "volante termico", "stuurverwarming", "rattvärme" ],
+    "SIDEMIRRORSON":[ 17, "side mirrors", "specchietti termici", "zijspiegel verwarming", "sidospeglar" ],
+    "SEATFL":       [ 18, "seat front-left", "sedile guidatore", "bestuurdersstoel", "förarstol" ],
+    "SEATFR":       [ 19, "seat front-right", "sedile passeggero", "bijrijdersstoel", "passagerarstol" ],
+    "SEATRL":       [ 20, "seat rear-left", "sedile post.sx", "achterbank links", "baksäte vänster" ],
+    "SEATRR":       [ 21, "seat rear-right", "sedile post.dx", "achterbank rechts", "baksäte höger" ],
+    "OPEN":         [ 22, "open", "aperta", "open", "öppen" ],
+    "TRUNK":        [ 23, "trunk open", "bagagliaio aperto", "kofferbak", "bagagelucka" ],
+    "HOOD":         [ 24, "hood open", "cofano aperto", "motorkap", "motorhuv" ],
+    "12VBATT":      [ 25, "12V battery", "batteria 12V", "12V batterij", "batteri 12V" ],
+    "KEYBATT":      [ 26, "key battery", "batteria radiocomando", "batterij afstandsbediening", "nyckelbatteri" ],
+    "WASHER":       [ 27, "washer fluid", "liquido tergicristallo", "ruitensproeiervloeistof", "spolarvätska" ],
+    "BRAKE":        [ 28, "brake fluid", "olio freni", "rem", "bromsvätska" ],
+    "TIRES":        [ 29, "tyre pressure", "pressione gomme", "bandenspanning", "däcktryck" ],
+    "CLIMATEMP":    [ 30, "climate temperature", "temperatura clima", "airco temperatuur", "klimattemperatur" ],
 }
 
 class BasePlugin:
