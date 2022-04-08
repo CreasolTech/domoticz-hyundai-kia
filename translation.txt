@@ -24,7 +24,7 @@ DEVS={ #topic:      [ num, "en name", "it name", "nl name", "se name", "hu name"
     "SEATFL":       [ 18, "seat front-left", "sedile guidatore", "bestuurdersstoel", "förarstol", "bal első ülés", "siedzenie przednie lewe" ],
     "SEATFR":       [ 19, "seat front-right", "sedile passeggero", "bijrijdersstoel", "passagerarstol", "jobb első ülés", "siedzenie przednie prawe" ],
     "SEATRL":       [ 20, "seat rear-left", "sedile post.sx", "achterbank links", "baksäte vänster", "bal hátsó ülés", "siedzenie tylne lewe" ],
-    "SEATRR":       [ 21, "seat rear-right", "sedile post.dx", "achterbank rechts", "baksäte höger", "jobb hátsó ülés", siedzenie tylne prawe ],
+    "SEATRR":       [ 21, "seat rear-right", "sedile post.dx", "achterbank rechts", "baksäte höger", "jobb hátsó ülés", "siedzenie tylne prawe" ],
     "OPEN":         [ 22, "open", "aperta", "open", "öppen", "nyitva", "otwarte" ],
     "TRUNK":        [ 23, "trunk open", "bagagliaio aperto", "kofferbak", "bagagelucka", "casomagtér nyitva", "bagażnik otwarty" ],
     "HOOD":         [ 24, "hood open", "cofano aperto", "motorkap", "motorhuv", "motorháztető nyitva", "pokrywa silnika otwarta" ],
