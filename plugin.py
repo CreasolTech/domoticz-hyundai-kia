@@ -80,7 +80,7 @@ LANGBASE=1  # item in the DEVS list where the first language starts
 #French translation by Neutrino
 #If you want to add another language, please add, for each line:     , "your translation"
 DEVS={ #topic:      [ num, "en name", "it name", "nl name", "se name", "hu name", "pl name", "fr name"other languages should follow  ],
-    "EVSTATE":      [ 1, "EV state", "EV stato", "EV status", "EV status", "EV státusz", "EV staus", "Status VE" ]
+    "EVSTATE":      [ 1, "EV state", "EV stato", "EV status", "EV status", "EV státusz", "EV staus", "Status VE" ],
     "EVBATTLEVEL":  [ 2, "EV battery level", "EV livello batteria", "batterijniveau", "EV batterinivå", "EV akku töltöttség", "EV poziom baterii", "Niveau de batterie"],
     "EVRANGE":      [ 3, "EV range", "EV autonomia", "EV bereik" , "EV räckvidd", "EV hatótáv", "EV zasięg", "Autonomie VE" ],
     "FUELLEVEL":    [ 4, "fuel level", "livello carburante", "brandstofniveau", "bränslenivå" , "üzemanyagszint", "poziom paliwa" ,"Niveau de carburant"],
