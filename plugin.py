@@ -69,44 +69,44 @@ from datetime import datetime
 from hyundai_kia_connect_api import *
 
 
-LANGS=[ "en", "it", "nl", "se" ] # list of supported languages, in DEVS dict below
+LANGS=[ "en", "it", "nl", "se", "hu", "pl" ] # list of supported languages, in DEVS dict below
 LANGBASE=1  # item in the DEVS list where the first language starts 
 
 #Dutch translation by Branko
 #Svedish translation by Joakim W.
 #Hungarian translation by Upo
 #If you want to add another language, please add, for each line:     , "your translation"
-DEVS={ #topic:      [ num, "en name", "it name", "nl name", "se name"  , "hu name" , other languages should follow  ],
-    "EVSTATE":      [ 1, "EV state", "EV stato", "EV status", "EV status", "EV státusz" ]
-    "EVBATTLEVEL":  [ 2, "EV battery level", "EV livello batteria", "batterijniveau", "EV batterinivå", "EV akku töltöttség" ],
-    "EVRANGE":      [ 3, "EV range", "EV autonomia", "EV bereik" , "EV räckvidd", "EV hatótáv" ],
-    "FUELLEVEL":    [ 4, "fuel level", "livello carburante", "brandstofniveau", "bränslenivå" , "üzemanyagszint" ],
-    "FUELRANGE":    [ 5, "fuel range", "autonomia carburante", "brandstof bereik", "bränsleräckvidd" , "üzemanyag hatótáv"],
-    "ENGINEON":     [ 6, "engine ON", "motore acceso", "motor aan", "motor på", "motor be" ],
-    "ODOMETER":     [ 7, "odometer", "contachilometri", "kilometerteller", "odometer" , "kilométer-számláló"],
-    "LOCATION":     [ 8, "location", "posizione", "locatie", "plats", "hely" ],
-    "HOMEDIST":     [ 9, "distance", "distanza", "afstand", "avstånd", "távolság" ],
-    "SPEED":        [ 10, "speed", "velocità", "snelheid", "hastighet", "sebesség" ],
-    "UPDATE":       [ 11, "update req.", "aggiorna", "bijwerken", "uppdatering", "frissítés" ],
-    "TEMPSET":      [ 12, "temp. settings", "imp. temperatura", "temperatuur inst.", "temperatur", "hőmérséklet beállítás" ],
-    "CLIMAON":      [ 13, "climate", "clima acceso", "airco", "klimat", "klíma" ],
-    "DEFROSTON":    [ 14, "defrost", "scongelamento", "ontdooien", "defrost", "páramentesítő" ],
-    "REARWINDOWON": [ 15, "rear window", "lunotto termico", "achterruitverwarming", "bakrutevärme", "hátsó ablak" ],
-    "STEERINGWHEELON": [ 16, "steering wheel", "volante termico", "stuurverwarming", "rattvärme", "kormány" ],
-    "SIDEMIRRORSON":[ 17, "side mirrors", "specchietti termici", "zijspiegel verwarming", "sidospeglar", "oldalsó tükrök" ],
-    "SEATFL":       [ 18, "seat front-left", "sedile guidatore", "bestuurdersstoel", "förarstol", "bal első ülés" ],
-    "SEATFR":       [ 19, "seat front-right", "sedile passeggero", "bijrijdersstoel", "passagerarstol", "jobb első ülés" ],
-    "SEATRL":       [ 20, "seat rear-left", "sedile post.sx", "achterbank links", "baksäte vänster", "bal hátsó ülés" ],
-    "SEATRR":       [ 21, "seat rear-right", "sedile post.dx", "achterbank rechts", "baksäte höger", "jobb hátsó ülés" ],
-    "OPEN":         [ 22, "open", "aperta", "open", "öppen", "nyitva" ],
-    "TRUNK":        [ 23, "trunk open", "bagagliaio aperto", "kofferbak", "bagagelucka", "casomagtér nyitva" ],
-    "HOOD":         [ 24, "hood open", "cofano aperto", "motorkap", "motorhuv", "motorháztető nyitva" ],
-    "12VBATT":      [ 25, "12V battery", "batteria 12V", "12V batterij", "batteri 12V", "12V akku" ],
-    "KEYBATT":      [ 26, "key battery", "batteria radiocomando", "batterij afstandsbediening", "nyckelbatteri", "kulcs elem" ],
-    "WASHER":       [ 27, "washer fluid", "liquido tergicristallo", "ruitensproeiervloeistof", "spolarvätska", "ablakmosó" ],
-    "BRAKE":        [ 28, "brake fluid", "olio freni", "rem", "bromsvätska", "fékfolyadék" ],
-    "TIRES":        [ 29, "tyre pressure", "pressione gomme", "bandenspanning", "däcktryck", "guminyomás" ],
-    "CLIMATEMP":    [ 30, "climate temperature", "temperatura clima", "airco temperatuur", "klimattemperatur", "klíma hőfok" ],
+DEVS={ #topic:      [ num, "en name", "it name", "nl name", "se name", "hu name", "pl name", other languages should follow  ],
+    "EVSTATE":      [ 1, "EV state", "EV stato", "EV status", "EV status", "EV státusz", "EV staus" ]
+    "EVBATTLEVEL":  [ 2, "EV battery level", "EV livello batteria", "batterijniveau", "EV batterinivå", "EV akku töltöttség", "EV poziom baterii" ],
+    "EVRANGE":      [ 3, "EV range", "EV autonomia", "EV bereik" , "EV räckvidd", "EV hatótáv", "EV zasięg" ],
+    "FUELLEVEL":    [ 4, "fuel level", "livello carburante", "brandstofniveau", "bränslenivå" , "üzemanyagszint", "poziom paliwa" ],
+    "FUELRANGE":    [ 5, "fuel range", "autonomia carburante", "brandstof bereik", "bränsleräckvidd" , "üzemanyag hatótáv", "zasięg paliwa" ],
+    "ENGINEON":     [ 6, "engine ON", "motore acceso", "motor aan", "motor på", "motor be", "silnik włączony" ],
+    "ODOMETER":     [ 7, "odometer", "contachilometri", "kilometerteller", "odometer" , "kilométer-számláló", "licznik kilometrów" ],
+    "LOCATION":     [ 8, "location", "posizione", "locatie", "plats", "hely", "pozycja" ],
+    "HOMEDIST":     [ 9, "distance", "distanza", "afstand", "avstånd", "távolság", "dystans" ],
+    "SPEED":        [ 10, "speed", "velocità", "snelheid", "hastighet", "sebesség", "prędkość" ],
+    "UPDATE":       [ 11, "update req.", "aggiorna", "bijwerken", "uppdatering", "frissítés", "aktualizacja" ],
+    "TEMPSET":      [ 12, "temp. settings", "imp. temperatura", "temperatuur inst.", "temperatur", "hőmérséklet beállítás", "ustawienie temperatury" ],
+    "CLIMAON":      [ 13, "climate", "clima acceso", "airco", "klimat", "klíma", "klimatyzacja" ],
+    "DEFROSTON":    [ 14, "defrost", "scongelamento", "ontdooien", "defrost", "páramentesítő", "rozmrożenie" ],
+    "REARWINDOWON": [ 15, "rear window", "lunotto termico", "achterruitverwarming", "bakrutevärme", "hátsó ablak", "tylne okno" ],
+    "STEERINGWHEELON": [ 16, "steering wheel", "volante termico", "stuurverwarming", "rattvärme", "kormány", "kierownica" ],
+    "SIDEMIRRORSON":[ 17, "side mirrors", "specchietti termici", "zijspiegel verwarming", "sidospeglar", "oldalsó tükrök", "lusterka boczne" ],
+    "SEATFL":       [ 18, "seat front-left", "sedile guidatore", "bestuurdersstoel", "förarstol", "bal első ülés", "siedzenie przednie lewe" ],
+    "SEATFR":       [ 19, "seat front-right", "sedile passeggero", "bijrijdersstoel", "passagerarstol", "jobb első ülés", "siedzenie przednie prawe" ],
+    "SEATRL":       [ 20, "seat rear-left", "sedile post.sx", "achterbank links", "baksäte vänster", "bal hátsó ülés", "siedzenie tylne lewe" ],
+    "SEATRR":       [ 21, "seat rear-right", "sedile post.dx", "achterbank rechts", "baksäte höger", "jobb hátsó ülés", "siedzenie tylne prawe" ],
+    "OPEN":         [ 22, "open", "aperta", "open", "öppen", "nyitva", "otwarte" ],
+    "TRUNK":        [ 23, "trunk open", "bagagliaio aperto", "kofferbak", "bagagelucka", "casomagtér nyitva", "bagażnik otwarty" ],
+    "HOOD":         [ 24, "hood open", "cofano aperto", "motorkap", "motorhuv", "motorháztető nyitva", "pokrywa silnika otwarta" ],
+    "12VBATT":      [ 25, "12V battery", "batteria 12V", "12V batterij", "batteri 12V", "12V akku", "akumulator 12V" ],
+    "KEYBATT":      [ 26, "key battery", "batteria radiocomando", "batterij afstandsbediening", "nyckelbatteri", "kulcs elem", "bateria kluczyka" ],
+    "WASHER":       [ 27, "washer fluid", "liquido tergicristallo", "ruitensproeiervloeistof", "spolarvätska", "ablakmosó", "płyn spryskiwaczy" ],
+    "BRAKE":        [ 28, "brake fluid", "olio freni", "rem", "bromsvätska", "fékfolyadék", "płyn hamulcowy" ],
+    "TIRES":        [ 29, "tyre pressure", "pressione gomme", "bandenspanning", "däcktryck", "guminyomás", "ciśnienie w oponie" ],
+    "CLIMATEMP":    [ 30, "climate temperature", "temperatura clima", "airco temperatuur", "klimattemperatur", "klíma hőfok", "temperatura klimatyzacji" ],
 }
 
 class BasePlugin:
