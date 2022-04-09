@@ -1,6 +1,9 @@
 domoticz-hyundai-kia plugin
 ChangeLog
 
+20220409 1.0.3
+Added several translations: many thanks to the translators!
+
 20220406 1.0.2
 Added start/stop climate, and thermostat setpoint to set the climate temperature
 

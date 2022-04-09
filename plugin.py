@@ -10,7 +10,7 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.0.2" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.0.3" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
         <h2>Domoticz Hyundai Kia connect plugin</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about owned Hyundai and Kia vehicles, such as odometer, EV battery charge, 
@@ -152,9 +152,10 @@ class BasePlugin:
         self._lang=Settings["Language"]
         # check if language set in domoticz exists
         if self._lang in LANGS:
-            _devlang=LANGBASE+LANGS.index(self._lang)
+            self._devlang=LANGBASE+LANGS.index(self._lang)
         else:
             Domoticz.Log(f"Language {self._lang} does not exist in dict DEVS, inside the domoticz_hyundai_kia plugin, but you can contribute adding it ;-) Thanks!")
+            self._lang="en"
             self._devlang=LANGBASE # default: english text
         self._pollInterval = float(Parameters["Mode1"])
         self._pollIntervalCharging = float(Parameters["Mode2"])
@@ -190,13 +191,14 @@ class BasePlugin:
                 Domoticz.Log(f"Name={name} Odometer={v._odometer_value}{v._odometer_unit} Battery={v.ev_battery_percentage}")
                 Domoticz.Log(f"Vehicle={v}")
             
-                # base = Unit base = 0, 32, 64, 96  # up to 4 vehicle can be addressed, 32 devices per vehicle (Unit <= 255)
-                # Find the right base
+                # base = Unit base = 0, 32, 64, 96  # up to 8 vehicles can be addressed, 32 devices per vehicle (Unit <= 255)
+                # Find the right Unit for the current car
                 baseFree = 256
-                for base in range(0, 256+1, 32):
-                    if base+DEVS['ODOMETER'][0] in Devices and Devices[base+DEVS['ODOMETER'][0]].Name == f"{name} {DEVS['ODOMETER'][self._devlang]}":   
-                        # odometer exists: check that Domoticz device name correspond with vehicle name (set on Kia connect)
-                        break
+                for base in range(0, 256-1, 32):
+                    if base+(DEVS['ODOMETER'][0]) in Devices:
+                        if Devices[base+(DEVS['ODOMETER'][0])].Name == f"{name} {DEVS['ODOMETER'][self._devlang]}":   
+                            # odometer exists: check that Domoticz device name correspond with vehicle name (set on Kia connect)
+                            break
                     else:
                         if baseFree > base:
                             baseFree = base # free base where devices can be stored
