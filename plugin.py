@@ -151,9 +151,9 @@ class BasePlugin:
         Domoticz.Debug("Settings="+str(Settings))
         self._lang=Settings["Language"]
         # check if language set in domoticz exists
-        try:
-            self._devlang=LANGBASE+LANGS.index(self._lang)
-        except ValueError:
+        if self._lang in LANGS:
+            _devlang=LANGBASE+LANGS.index(self._lang)
+        else:
             Domoticz.Log(f"Language {self._lang} does not exist in dict DEVS, inside the domoticz_hyundai_kia plugin, but you can contribute adding it ;-) Thanks!")
             self._devlang=LANGBASE # default: english text
         self._pollInterval = float(Parameters["Mode1"])
