@@ -10,7 +10,7 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.0.3" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.0.4" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
         <h2>Domoticz Hyundai Kia connect plugin</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about owned Hyundai and Kia vehicles, such as odometer, EV battery charge, 
@@ -121,6 +121,7 @@ class BasePlugin:
         self.interval = 10              # current polling interval (depending by charging, moving, night time, ...) It's set by mustPoll()
         self._lastPoll = None           # last time I got vehicle status
         self._checkDevices = True       # if True, check that all devices are created (at startup and when update is forced)
+        self._fetchingData = False      # True while fetching data from API
         self._isCharging = False  
         self._engineOn = False
         self._lang = "en"
@@ -130,6 +131,8 @@ class BasePlugin:
 
     def mustPoll(self):
         """ Return True if new data should be polled """
+        if self._fetchingData == True:
+            return False    # fetching data already in progress
         if self._lastPoll == None: 
             return True
         elapsedTime = int( (datetime.now()-self._lastPoll).total_seconds() / 60)  # time in minutes
@@ -143,8 +146,6 @@ class BasePlugin:
             return True
         return False
 
-    def updatePollInterval(self):
-        self._lastPoll = datetime.now()
 
     def onStart(self):
         Domoticz.Debug("Parameters="+str(Parameters))
@@ -163,22 +164,23 @@ class BasePlugin:
         self._lastPoll = None   # force reconnecting in 10 seconds 
         #self._lastPoll = datetime.now() # do not reconnect in 10 seconds, to avoid daily connection exceeding during testing #DEBUG 
         
-        #logging.basicConfig(filename='/tmp/domoticz_hyundai_kia.log', encoding='utf-8', level=logging.DEBUG)
         logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.DEBUG)
 
     def onHeartbeat(self):
         """ Called every 10 seconds or other interval set by Domoticz.Heartbeat() """
-        if self.mustPoll():   # check if vehicles data should be polled 
+        if self.mustPoll():   # check if vehicles data should be polled. return False if polling is already in progress 
+            self._lastPoll = datetime.now()
+            Domoticz.Log(f"check_and_refresh_token()...")
             ret=self.vm.check_and_refresh_token()
-            Domoticz.Log(f"self.vm.check_and_refresh_token() returned {ret}")   
 #            self.vm.force_refresh_all_vehicles_states() # it does not update location and speed!
 #            Domoticz.Log(f"self.vm.force_refresh_all_vehicles_states()")
 #            ret=self.vm.check_and_force_update_vehicles(self.interval)     # suggested by fuatakgun
 #            Domoticz.Log(f"self.vm.check_and_force_update_vehicles({self.interval}) returned {ret}")
 #            self.vm.update_all_vehicles_with_cached_state()    # not needed
+            Domoticz.Log(f"force_refresh_all_vehicles_states()..")
             self.vm.force_refresh_all_vehicles_states() # suggested by P.Levres: fetch data from vehicle to the cloud
+            Domoticz.Log("update_all_vehicles_with_cached_state()...")
             self.vm.update_all_vehicles_with_cached_state()  # suggested by P.Levres: download data from the cloud
-            self.updatePollInterval()
             self._isCharging=False  # set to false: if one vehicle is charging, this flag will be set by updateDevices()
             self._engineOn=False    # set to false: if one vehicle is moving,   this flag will be set by updateDevices()
             # Now self.vm.vehicles contains a table with the list of registered vehicles and their parameters
@@ -196,7 +198,7 @@ class BasePlugin:
                 baseFree = 256
                 for base in range(0, 256-1, 32):
                     if base+(DEVS['ODOMETER'][0]) in Devices:
-                        if Devices[base+(DEVS['ODOMETER'][0])].Name == f"{name} {DEVS['ODOMETER'][self._devlang]}":   
+                        if name in Devices[base+(DEVS['ODOMETER'][0])].Name:   
                             # odometer exists: check that Domoticz device name correspond with vehicle name (set on Kia connect)
                             break
                     else:
@@ -212,17 +214,22 @@ class BasePlugin:
                     # car found or just created: update values
                     if self._checkDevices == True: self.addDevices(base, name, v)
                     self.updateDevices(base, name, v)
+
             self._checkDevices=False
+            self._fetchingData=False    # fetching data from API ended correctly
 
     def onCommand(self, Unit, Command, Level, Hue):
         Domoticz.Log(f"onCommand(Unit={Unit}, Command={Command}, Level={Level}, Hue={Hue})")
         if (Unit&31) == DEVS["UPDATE"][0]:  #force status update
             Devices[Unit].Update(nValue=1 if Command=="On" else 0, sValue=Command)
             if Command=="On":
-                Domoticz.Log("Force update command")
-                self._checkDevices = True
-                self._lastPoll = None
-                self.onHeartbeat()
+                if self.mustPoll():
+                    Domoticz.Log("Force update command")
+                    self._checkDevices = True
+                    self._lastPoll = None
+                    self.onHeartbeat()
+            else:
+                self._fetchingData=False    # reset flag that states that fetching is in progress
         else:
             # get name and id for the vehicle
             Domoticz.Log(f"Device Name={Devices[Unit].Name}")
@@ -309,7 +316,6 @@ class BasePlugin:
         dev=DEVS['ODOMETER']; var=v.odometer
         if var != None and base+dev[0] not in Devices:
             Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=113, Subtype=0, Switchtype=3, Used=1).Create()
-        # TODO: LOCATION
 
         dev=DEVS['LOCATION']; var=v.location_latitude
         if var != None and base+dev[0] not in Devices:
@@ -326,8 +332,6 @@ class BasePlugin:
         dev=DEVS['UPDATE']
         if base+dev[0] not in Devices:
             Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang]}", Type=244, Subtype=73, Used=1).Create() 
-
-        # TODO: TEMPSET (thermostat)
 
         dev=DEVS['CLIMAON']; var=v.air_control_is_on
         if var != None and base+dev[0] not in Devices:
