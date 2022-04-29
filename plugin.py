@@ -226,7 +226,7 @@ class BasePlugin:
         if (Unit&31) == DEVS["UPDATE"][0]:  #force status update
             Devices[Unit].Update(nValue=1 if Command=="On" else 0, sValue=Command)
             if Command=="On":
-                if self._fetchingData == False():
+                if self._fetchingData == False:
                     Domoticz.Log("Force update command")
                     self._checkDevices = True
                     self._lastPoll = None
