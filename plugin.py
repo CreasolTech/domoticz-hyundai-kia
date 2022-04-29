@@ -45,12 +45,12 @@
                 <option label="240 minutes" value="240" />
             </options>
         </param>
-        <param field="Mode2" label="Poll interval while charging or driving">
+        <param field="Mode2" label="Poll interval while driving">
             <options>
                 <option label="5 minutes" value="5" />
                 <option label="10 minutes" value="10" />
-                <option label="20 minutes" value="20" />
-                <option label="30 minutes" value="30" default="true" />
+                <option label="20 minutes" value="20" default="true" />
+                <option label="30 minutes" value="30" />
                 <option label="60 minutes" value="60" />
                 <option label="120 minutes" value="60" />
             </options>
@@ -117,7 +117,7 @@ class BasePlugin:
 
     def __init__(self):
         self._pollInterval = 120        # fetch data every 120 minutes, by default (but check parameter Mode1!)
-        self._pollIntervalCharging = 30 # while charging, fetch data quickly 
+        self._pollIntervalDriving = 30 # while charging, fetch data quickly 
         self.interval = 10              # current polling interval (depending by charging, moving, night time, ...) It's set by mustPoll()
         self._lastPoll = None           # last time I got vehicle status
         self._checkDevices = True       # if True, check that all devices are created (at startup and when update is forced)
@@ -137,8 +137,10 @@ class BasePlugin:
             return True
         elapsedTime = int( (datetime.now()-self._lastPoll).total_seconds() / 60)  # time in minutes
         self.interval = self._pollInterval
-        if self._isCharging or self._engineOn:
-            self.interval = self._pollIntervalCharging   # while charging or driving, reduce the poll interval
+        if self._engineOn:
+            self.interval = self._pollIntervalDriving   # while charging or driving, reduce the poll interval
+        elif self._isCharging:
+            self.interval = self._pollIntervalDriving*2
         elif datetime.now().hour>=22 or datetime.now().hour<6:
             self.interval*=4     # reduce polling during the night
             if self.interval > 120: self.interval = 120
@@ -159,12 +161,13 @@ class BasePlugin:
             self._lang="en"
             self._devlang=LANGBASE # default: english text
         self._pollInterval = float(Parameters["Mode1"])
-        self._pollIntervalCharging = float(Parameters["Mode2"])
+        self._pollIntervalDriving = float(Parameters["Mode2"])
         self.vm = VehicleManager(region=int(Parameters["Address"]), brand=int(Parameters["Port"]), username=Parameters["Username"], password=Parameters["Password"], pin=Parameters["Mode3"])
         self._lastPoll = None   # force reconnecting in 10 seconds 
         #self._lastPoll = datetime.now() # do not reconnect in 10 seconds, to avoid daily connection exceeding during testing #DEBUG 
         
-        logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.DEBUG)
+        logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.INFO)
+        #logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.DEBUG)
 
     def onHeartbeat(self):
         """ Called every 10 seconds or other interval set by Domoticz.Heartbeat() """
@@ -223,7 +226,7 @@ class BasePlugin:
         if (Unit&31) == DEVS["UPDATE"][0]:  #force status update
             Devices[Unit].Update(nValue=1 if Command=="On" else 0, sValue=Command)
             if Command=="On":
-                if self.mustPoll():
+                if self._fetchingData == False():
                     Domoticz.Log("Force update command")
                     self._checkDevices = True
                     self._lastPoll = None

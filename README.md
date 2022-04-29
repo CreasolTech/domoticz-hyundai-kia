@@ -56,13 +56,13 @@ Please note that there are some restrictions on the number of daily access to th
 
 
 # Features
-* It's possible to configure 2 polling intervals, to limit accesses to the cloud (Kia Europe limit is 200 accesses/day): a standard interval, a shorter interval when charging or moving (to track battery and position/speed), and a longer interval during the night computed as 4x polling interval, max 120 minutes).
+* It's possible to configure 2 polling intervals, to limit accesses to the cloud (Kia Europe limit is 200 accesses/day): a standard interval, a shorter interval when driving (to track battery and position/speed), and a longer interval during the night computed as 4x polling interval, max 120 minutes).  The polling interval while charging is computed as interval_driving * 2.
 
 * Permits to monitor all variables provided by the API
 
 * Also, permits to monitor the distance from home and have a map and address of the car location.
 
-
+* It's possible to set the climate temperature and activate climate from Domoticz. In this way it's easy, for example, to create a scene that enable EVSE (charging station) and vehicle climate for 15 minutes, for example, to pre-heat the vehicle in the winter morning before going to work.
 
 # Charging the electric car in a smart way
 
