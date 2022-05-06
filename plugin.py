@@ -415,7 +415,7 @@ class BasePlugin:
         if v.ev_battery_is_charging != None:
             nValue=0
             sValue="Disconnected"
-            if v.ev_battery_is_charging:
+            if v.ev_battery_is_charging == True:
                 nValue=1
                 sValue="Charging"
                 self._isCharging=True
@@ -424,8 +424,10 @@ class BasePlugin:
                 sValue="Connected"
             Devices[base+DEVS['EVSTATE'][0]].Update(nValue=nValue, sValue=sValue)
         
+        batteryLevel=None   # show batteryLevel in the debug messages
         if v.ev_battery_percentage != None:
             nValue=v.ev_battery_percentage
+            batteryLevel=v.ev_battery_percentage
             Devices[base+DEVS['EVBATTLEVEL'][0]].Update(nValue=nValue, sValue=str(nValue))
         
         nValue=v.ev_driving_distance
@@ -476,7 +478,7 @@ class BasePlugin:
                 nValue=value['vehicleLocation']['speed']['value']
                 sValue=str(nValue)
                 Devices[base+DEVS['SPEED'][0]].Update(nValue=nValue, sValue=sValue)
-                Domoticz.Log(f"Vehicle {name} has odometer={v.odometer} speed={nValue} distance from home={distance}")
+                Domoticz.Log(f"Vehicle {name} has odometer={v.odometer} speed={nValue} distance_from_home={distance} battery_level={batteryLevel}")
 
         # Reset force update button
         Devices[base+DEVS['UPDATE'][0]].Update(nValue=0, sValue="Off")
