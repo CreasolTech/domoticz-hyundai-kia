@@ -74,7 +74,7 @@ LANGBASE=1  # item in the DEVS list where the first language starts
 
 
 #Dutch translation by Branko
-#Svedish translation by Joakim W.
+#Swedish translation by Joakim W.
 #Hungarian translation by Upo
 #Polish translation by z1mEk
 #French translation by Neutrino

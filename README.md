@@ -94,9 +94,9 @@ Please note that there are some restrictions on the number of daily access to th
 
 
 # Credits
-Many thanks for the language translation to:
+Many thanks for the following language translations:
 * Dutch translation by Branko
-* Svedish translation by Joakim W.
+* Swedish translation by Joakim W.
 * Hungarian translation by Upo
 * Polish translation by z1mEk
 * French translation by Neutrino
