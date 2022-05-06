@@ -3,7 +3,7 @@ Author: Creasol https://www.creasol.it/domotics
 
 For any support request, please write to linux at creasol dot it or enter the Telegram DomBus group https://t.me/DomBus 
 
-[![alt Kia car panel, in Domoticz, with some controls to charge the EV car by Creasol DomBusEVSE](https://images.creasol.it/kia_domoticz2.webp "Kia car panel, in Domoticz, with some controls to charge the EV car by Creasol DomBusEVSE")](https://www.creasol.it/domotics)
+[![alt Kia car panel, in Domoticz, with some controls to charge the EV car by Creasol DomBusEVSE](https://images.creasol.it/kia_domoticz2.webp "Kia car panel, in Domoticz, with some controls to charge the EV car by Creasol DomBusEVSE")](https://www.creasol.it/EVSE)
 
 # Introduction
 
@@ -52,8 +52,9 @@ Features:
 	3. __when battery level is below minimum, charge at the max power__ permitted by the electricity meter (in Italy, alternates 90 minutes at maximum power + 27% and 90 minutes at maximum power + 10%, ___it's not possible to charge faster!___ The electrical system must be checked carefully when using maximum power, to avoid overheating and fires!!)
 	4. __when battery level is between minimum and maximum, charge using only power from renewable energy__ (from photovoltaic) keeping 0W imported from the grid.
 
-More info at https://www.creasol.it/en/support/domotics-home-automation-and-diy/155-smart-electric-vehicle-charging
+More info at https://www.creasol.it/EVSE
 
+Video about DomBus modules: https://youtu.be/QfkT5J5FWoM
 
 
 # Installation
