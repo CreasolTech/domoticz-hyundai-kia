@@ -3,6 +3,7 @@ Author: Creasol https://www.creasol.it/domotics
 
 For any support request, please write to linux at creasol dot it or enter the Telegram DomBus group https://t.me/DomBus 
 
+[![alt Kia car panel, in Domoticz, with some controls to charge the EV car by Creasol DomBusEVSE](https://images.creasol.it/kia_domoticz2.webp "Kia car panel, in Domoticz, with some controls to charge the EV car by Creasol DomBusEVSE")](https://www.creasol.it/domotics)
 
 # Introduction
 
@@ -53,7 +54,6 @@ Features:
 
 More info at https://www.creasol.it/en/support/domotics-home-automation-and-diy/155-smart-electric-vehicle-charging
 
-[![alt Kia car panel, in Domoticz, with some controls to charge the EV car by Creasol DomBusEVSE](https://images.creasol.it/kia_domoticz2.webp "Kia car panel, in Domoticz, with some controls to charge the EV car by Creasol DomBusEVSE")](https://www.creasol.it/domotics)
 
 
 # Installation
