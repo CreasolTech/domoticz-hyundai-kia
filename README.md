@@ -93,5 +93,11 @@ Then, enter Domoticz panel, go to Setup -> Hardware and enable the Hyundai Kia c
 Please note that there are some restrictions on the number of daily access to the cloud... for example EU customers cannot connect more than 200 times/day
 
 
-
+# Credits
+Many thanks for the language translation to:
+* Dutch translation by Branko
+* Svedish translation by Joakim W.
+* Hungarian translation by Upo
+* Polish translation by z1mEk
+* French translation by Neutrino
 
