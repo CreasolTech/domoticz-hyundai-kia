@@ -35,7 +35,7 @@ This plugin can be installed typing the following commands from a shell: instead
 
 Creasol is developing a __cheap and smart DIY EVSE module__ that can work stand-alone or connected to Domoticz.
 
-Video at https://www.youtube.com/watch?v=fyDtGO6S1UI
+[![Video showing electric vehicle charging by Domoticz and Creasol DomBusEVSE module](https://images.creasol.it/youtube_small.png) Video showing electric car charging by Domoticz and DomBusEVSE module](https://www.youtube.com/watch?v=fyDtGO6S1UI)
 
 Features:
 * detects plug connection and disconnection
@@ -54,7 +54,7 @@ Features:
 
 More info at https://www.creasol.it/EVSE
 
-Video about DomBus modules: https://youtu.be/QfkT5J5FWoM
+[![Video about Creasol DomBus modules for Domoticz](https://images.creasol.it/youtube_small.png) Video about DomBus modules](https://youtu.be/QfkT5J5FWoM)
 
 
 # Installation
