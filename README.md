@@ -86,11 +86,14 @@ git clone https://github.com/jwefers/hyundai_kia_connect_api
 mv /usr/local/lib/python3.9/hyundai_kia_connect_api /var/tmp 2>/dev/null
 ln -s /usr/local/src/hyundai_kia_connect_api/hyundai_kia_connect_api /usr/local/lib/python3.9/hyundai_kia_connect_api
 
+#return on previous directory
+cd -
 
 #remove __pycache__ dir from the lib (it contains the __pycache__ with sources compiled by a different python version or different CPU)
 for d in /usr/local/lib/python3*; do find $d -name __pycache__ -exec rm -r {} \; ; done
 
 #fetch Creasol Plugin
+
 git clone https://github.com/CreasolTech/domoticz-hyundai-kia
 
 #restart Domoticz daemon
