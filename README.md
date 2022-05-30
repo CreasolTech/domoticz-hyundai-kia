@@ -100,4 +100,5 @@ Many thanks for the following language translations:
 * Hungarian translation by Upo
 * Polish translation by z1mEk
 * French translation by Neutrino
+* German translation by Gerhard M.
 

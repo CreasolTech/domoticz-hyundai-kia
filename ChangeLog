@@ -1,6 +1,9 @@
 domoticz-hyundai-kia plugin
 ChangeLog
 
+20220530 1.0.5
+Added German translation. Thanks a lot to Gerhard M.!
+
 20220429 1.0.4
 Added fetchingData flag to avoid fetching data when another process is already
 fetching data from API. This flag is reset when fetching process terminates,
