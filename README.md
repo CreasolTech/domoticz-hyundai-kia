@@ -3,6 +3,8 @@ Author: Creasol https://www.creasol.it/domotics
 
 For any support request, please write to linux at creasol dot it or enter the Telegram DomBus group https://t.me/DomBus 
 
+[![Kia floorplan in Domoticz, simple example made in 10 minutes](https://images.creasol.it/kia-e-niro_domoticz_floorplan.webp)](https://www.creasol.it/EVSE)
+
 [![Kia car panel, in Domoticz, with some controls to charge the EV car by Creasol DomBusEVSE](https://images.creasol.it/kia_domoticz2.webp)](https://www.creasol.it/EVSE)
 
 # Introduction
