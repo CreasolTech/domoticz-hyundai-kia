@@ -1,6 +1,21 @@
 domoticz-hyundai-kia plugin
 ChangeLog
 
+TODO:
+* set_charge_limits
+
+20220908 1.0.7
+Word wrap on location device (long string with vehicle location address)
+Increased heartbeat interval to 30s
+
+Added start/stop charging button
+
+20220716 1.0.6
+Added two devices: charge limit AC and DC (not working yet: waiting for
+hyundai-kia-connect-api modification)
+Translation: if device name was not translated (""), then default language
+name is shown (English)
+
 20220530 1.0.5
 Added German translation. Thanks a lot to Gerhard M.!
 
