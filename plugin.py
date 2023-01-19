@@ -308,7 +308,7 @@ class BasePlugin:
                     options.climate=True if options.set_temp<23 else False
                     options.heating=True if options.set_temp>=23 else False
                     ret=self.vm.start_climate(vehicleId, options)
-                    Domoticz.Log(f"start_climate() returned {ret}")
+                    Domoticz.Log(f"start_climate() with options={options}. Returned {ret}")
                     Devices[Unit].Update(nValue=1, sValue="On")
                 else:   # Off command
                     ret=self.vm.stop_climate(vehicleId)

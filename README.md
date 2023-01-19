@@ -84,7 +84,7 @@ sudo apt install python3-dateutil
 cd  /usr/local/src
 git clone https://github.com/jwefers/hyundai_kia_connect_api
 mv /usr/local/lib/python3.9/hyundai_kia_connect_api /var/tmp 2>/dev/null
-ln -s /usr/local/src/hyundai_kia_connect_api/hyundai_kia_connect_api /usr/local/lib/python3.9/hyundai_kia_connect_api
+ln -s /usr/local/src/hyundai_kia_connect_api/hyundai_kia_connect_api /usr/local/lib/python3.9/dist-packages
 
 #return on previous directory
 cd -
