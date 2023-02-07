@@ -13,7 +13,7 @@
 <plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.0.8" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
         <h2>Domoticz Hyundai Kia connect plugin</h2>
-        This plugin permits to access, through the Hyundai Kia account credentials, to information about owned Hyundai and Kia vehicles, such as odometer, EV battery charge, 
+        This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
         tyres status, door lock status, and much more.<br/>
         <b>Before activating this plugin, assure that you've set the right name to your car</b> (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.<br/>
         Also, do not change the name of the ODOMETER device!<br/>
@@ -392,10 +392,10 @@ class BasePlugin:
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
 
-        if hasattr(v,'fuel_driving_distance'):
-            dev=DEVS['FUELRANGE']; var=v.fuel_driving_distance
+        if hasattr(v,'fuel_driving_range'):
+            dev=DEVS['FUELRANGE']; var=v.fuel_driving_range
             if var != None and base+dev[0] not in Devices:
-                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._fuel_driving_distance_unit}, Used=1).Create()
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._fuel_driving_range_unit}, Used=1).Create()
 
         if hasattr(v,'engine_is_running'):
             dev=DEVS['ENGINEON']; var=v.engine_is_running
@@ -561,8 +561,8 @@ class BasePlugin:
             if nValue != None:
                 Devices[base+DEVS['FUELLEVEL'][0]].Update(nValue=nValue, sValue=str(nValue))
             
-        if hasattr(v,'fuel_driving_distance'):
-            nValue=v.fuel_driving_distance
+        if hasattr(v,'fuel_driving_range'):
+            nValue=v.fuel_driving_range
             if nValue != None:
                 Devices[base+DEVS['FUELRANGE'][0]].Update(nValue=nValue, sValue=str(nValue))
             
