@@ -193,8 +193,8 @@ class BasePlugin:
         self._lastPoll = None   # force reconnecting in 10 seconds 
         #self._lastPoll = datetime.now() # do not reconnect in 10 seconds, to avoid daily connection exceeding during testing #DEBUG 
         
-        #logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.INFO)
-        logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.DEBUG) #DEBUG
+        logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.INFO)
+        #logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.DEBUG) #DEBUG
 
     def onHeartbeat(self):
         """ Called every 10 seconds or other interval set by Domoticz.Heartbeat() """
@@ -242,7 +242,7 @@ class BasePlugin:
                     name = re.sub(r'\W+', '', v.name)   # must be unique and identify the type of car, if more than 1 car is owned
                     if name not in self._name2id:
                         self._name2id[name]=k   # save the corresponding between vehicle name and id in vm.vehicles dict
-                    if v.ev_battery_percentage == None:
+                    if hasattr(v,'v.ev_battery_percentage') and v.ev_battery_percentage != None:
                         batterySOC=v.ev_battery_percentage
                     else: 
                         batterySOC=0
@@ -357,56 +357,57 @@ class BasePlugin:
         """ Add devices for car named {name}, starting from base unit {base}, using vehicle parameters in {v} """
         Domoticz.Log(f"Add devices for car {name} with base index {base}")
 
-        if v.ev_battery_is_charging != None:
+        if hasattr(v,'ev_battery_is_charging'):
             dev=DEVS['EVSTATE']; var=v.ev_battery_is_charging
             if var != None and base+dev[0] not in Devices: 
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=19, Used=1).Create()
-        if v.ev_battery_is_charging != None:
+
+        if hasattr(v,'ev_battery_is_charging'):
             dev=DEVS['EVCHARGEON']; var=v.ev_battery_is_charging
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        if v.ev_battery_percentage != None:
+        if hasattr(v,'ev_battery_percentage'):
             dev=DEVS['EVBATTLEVEL']; var=v.ev_battery_percentage
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
 
-        if v.ev_driving_distance != None:
+        if hasattr(v,'ev_driving_distance'):
             dev=DEVS['EVRANGE']; var=v.ev_driving_distance
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._ev_driving_distance_unit}, Used=1).Create()
 
-        if v._ev_charge_limits.ac != None:
+        if hasattr(v,'_ev_charge_limits.ac'):
             dev=DEVS['EVLIMITAC']; var=v._ev_charge_limits.ac
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=62, Switchtype=7, Used=1).Create()
 
-        if v._ev_charge_limits.dc != None:
+        if hasattr(v,'_ev_charge_limits.dc'):
             dev=DEVS['EVLIMITDC']; var=v._ev_charge_limits.dc
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=62, Switchtype=7, Used=1).Create()
 
-        if v.fuel_level != None:
+        if hasattr(v,'fuel_level'):
             dev=DEVS['FUELLEVEL']; var=v.fuel_level
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
 
-        if v.fuel_driving_distance != None:
+        if hasattr(v,'fuel_driving_distance'):
             dev=DEVS['FUELRANGE']; var=v.fuel_driving_distance
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._fuel_driving_distance_unit}, Used=1).Create()
 
-        if v.engine_is_running != None:
+        if hasattr(v,'engine_is_running'):
             dev=DEVS['ENGINEON']; var=v.engine_is_running
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        if v.odometer != None:
+        if hasattr(v,'odometer'):
             dev=DEVS['ODOMETER']; var=v.odometer
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=113, Subtype=0, Switchtype=3, Used=1).Create()
 
-        if v.location_latitude != None:
+        if hasattr(v,'location_latitude'):
             dev=DEVS['LOCATION']; var=v.location_latitude
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=19, Used=1).Create()
@@ -414,7 +415,7 @@ class BasePlugin:
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Used=1).Create()
 
-        if v.data != None:
+        if hasattr(v,'data'):
             dev=DEVS['SPEED']; var=v.data
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Used=1).Create()
@@ -423,92 +424,92 @@ class BasePlugin:
         if base+dev[0] not in Devices:
             Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create() 
 
-        if v.air_control_is_on != None:
+        if hasattr(v,'air_control_is_on'):
             dev=DEVS['CLIMAON']; var=v.air_control_is_on
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        if v.air_temperature != None:
+        if hasattr(v,'air_temperature'):
             dev=DEVS['CLIMATEMP']; var=v.air_temperature    # Thermostat
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=242, Subtype=1, Used=1).Create()
 
-        if v.defrost_is_on != None:
+        if hasattr(v,'defrost_is_on'):
             dev=DEVS['DEFROSTON']; var=v.defrost_is_on
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        if v.back_window_heater_is_on != None:
+        if hasattr(v,'back_window_heater_is_on'):
             dev=DEVS['REARWINDOWON']; var=v.back_window_heater_is_on
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        if v.steering_wheel_heater_is_on != None:
+        if hasattr(v,'steering_wheel_heater_is_on'):
             dev=DEVS['STEERINGWHEELON']; var=v.steering_wheel_heater_is_on
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        if v.side_mirror_heater_is_on != None:
+        if hasattr(v,'side_mirror_heater_is_on'):
             dev=DEVS['SIDEMIRRORSON']; var=v.side_mirror_heater_is_on
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        if v.front_left_seat_status != None:
+        if hasattr(v,'front_left_seat_status'):
             dev=DEVS['SEATFL']; var=v.front_left_seat_status
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=19, Used=1).Create()
 
-        if v.front_right_seat_status != None:
+        if hasattr(v,'front_right_seat_status'):
             dev=DEVS['SEATFR']; var=v.front_right_seat_status
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=19, Used=1).Create()
 
-        if v.rear_left_seat_status != None:
+        if hasattr(v,'rear_left_seat_status'):
             dev=DEVS['SEATRL']; var=v.rear_left_seat_status
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=19, Used=1).Create()
 
-        if v.rear_right_seat_status != None:
+        if hasattr(v,'rear_right_seat_status'):
             dev=DEVS['SEATRR']; var=v.rear_right_seat_status
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=19, Used=1).Create()
 
-        if v.is_locked != None:
+        if hasattr(v,'is_locked'):
             dev=DEVS['OPEN']; var=v.is_locked
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Switchtype=19, Used=1).Create()
 
-        if v.trunk_is_open != None:
+        if hasattr(v,'trunk_is_open'):
             dev=DEVS['TRUNK']; var=v.trunk_is_open
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Switchtype=11, Used=1).Create()
 
-        if v.hood_is_open != None:
+        if hasattr(v,'hood_is_open'):
             dev=DEVS['HOOD']; var=v.hood_is_open
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Switchtype=11, Used=1).Create()
 
-        if v.car_battery_percentage != None:
+        if hasattr(v,'car_battery_percentage'):
             dev=DEVS['12VBATT']; var=v.car_battery_percentage
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
 
-        if v.smart_key_battery_warning_is_on != None:
+        if hasattr(v,'smart_key_battery_warning_is_on'):
             dev=DEVS['KEYBATT']; var=v.smart_key_battery_warning_is_on
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=22, Used=1).Create()
 
-        if v.washer_fluid_warning_is_on != None:
+        if hasattr(v,'washer_fluid_warning_is_on'):
             dev=DEVS['WASHER']; var=v.washer_fluid_warning_is_on
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
 
-        if v.brake_fluid_warning_is_on != None:
+        if hasattr(v,'brake_fluid_warning_is_on'):
             dev=DEVS['BRAKE']; var=v.brake_fluid_warning_is_on
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
 
-        if v.tire_pressure_all_warning_is_on != None:
+        if hasattr(v,'tire_pressure_all_warning_is_on'):
             dev=DEVS['TIRES']; var=v.tire_pressure_all_warning_is_on
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
@@ -517,7 +518,7 @@ class BasePlugin:
         """ Update devices for car named {name}, starting from base unit {base}, using vehicle parameters in {v} """
         Domoticz.Log(f"Car found at base {base}")
 
-        if v.ev_battery_is_charging != None:
+        if hasattr(v,'ev_battery_is_charging') and v.ev_battery_is_charging != None:
             nValue=0
             sValue="Disconnected"
             if v.ev_battery_is_charging == True:
@@ -535,160 +536,185 @@ class BasePlugin:
             #Domoticz.Log(f"v.ev_battery_is_charging={v.ev_battery_is_charging}, nValue={nValue}, sValue={sValue}")
         
         batteryLevel=None   # show batteryLevel in the debug messages
-        if v.ev_battery_percentage != None:
+        if hasattr(v,'ev_battery_percentage') and v.ev_battery_percentage != None:
             nValue=v.ev_battery_percentage
             batteryLevel=v.ev_battery_percentage
             Devices[base+DEVS['EVBATTLEVEL'][0]].Update(nValue=nValue, sValue=str(nValue))
         
-        nValue=v.ev_driving_distance
-        if nValue != None:
-            Devices[base+DEVS['EVRANGE'][0]].Update(nValue=nValue, sValue=str(nValue))
-        
-        nValue=v._ev_charge_limits.ac
-        if nValue != None:
-            Devices[base+DEVS['EVLIMITAC'][0]].Update(nValue=1, sValue=str(nValue))
-        
-        nValue=v._ev_charge_limits.dc
-        if nValue != None:
-            Devices[base+DEVS['EVLIMITDC'][0]].Update(nValue=1, sValue=str(nValue))
-        
-        nValue=v.fuel_level
-        if nValue != None:
-            Devices[base+DEVS['FUELLEVEL'][0]].Update(nValue=nValue, sValue=str(nValue))
-        
-        nValue=v.fuel_driving_distance
-        if nValue != None:
-            Devices[base+DEVS['FUELRANGE'][0]].Update(nValue=nValue, sValue=str(nValue))
-        
-        value=v.engine_is_running
-        if value != None:
-            nValue=0; sValue="Off"
-            if (value):
-                nValue=1; sValue="On"
-                self._engineOn=True
-            Devices[base+DEVS['ENGINEON'][0]].Update(nValue=nValue, sValue=sValue)
-        
-        nValue=v.odometer
-        if nValue != None:
-            nValue=int(nValue)
-            Devices[base+DEVS['ODOMETER'][0]].Update(nValue=nValue, sValue=str(nValue))
-        
-        if (v.location_latitude != None and (name not in self._vehicleLoc or (v.location_latitude!=self._vehicleLoc[name]['latitude'] and v.location_longitude!=self._vehicleLoc[name]['longitude']))):
-            # LOCATION changed or not previously set
-            # get address
-            get_address_url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&lat=' + str(v.location_latitude) + '&lon=' + str(v.location_longitude)
-            response = requests.get(get_address_url)
-            if response.status_code == 200:
-                response = json.loads(response.text)
-                locAddr=response['display_name']
-                locMap = '<a href="http://www.google.com/maps/search/?api=1&query=' + str(v.location_latitude) + ',' + str(v.location_longitude) + '" target="_new"><em style="color:blue;">Map</em></a>'
-                Domoticz.Log(f"Location address: {locAddr}")
-                sValue=fill(locAddr, 40) + ' ' + locMap
-                Devices[base+DEVS['LOCATION'][0]].Update(nValue=0, sValue=sValue)
-
-            # HOME DISTANCE: compute distance from home
-            homeloc=Settings['Location'].split(';')
-            distance=round(self.distance(v.location_latitude, v.location_longitude, float(homeloc[0]), float(homeloc[1])), 1)
-            Devices[base+DEVS['HOMEDIST'][0]].Update(nValue=0, sValue=str(distance))
-
-            value=v.data
+        if hasattr(v,'ev_driving_distance'):
+            nValue=v.ev_driving_distance
+            if nValue != None:
+                Devices[base+DEVS['EVRANGE'][0]].Update(nValue=nValue, sValue=str(nValue))
+            
+        if hasattr(v,'_ev_charge_limits.ac'):
+            nValue=v._ev_charge_limits.ac
+            if nValue != None:
+                Devices[base+DEVS['EVLIMITAC'][0]].Update(nValue=1, sValue=str(nValue))
+            
+        if hasattr(v,'_ev_charge_limits.dc'):
+            nValue=v._ev_charge_limits.dc
+            if nValue != None:
+                Devices[base+DEVS['EVLIMITDC'][0]].Update(nValue=1, sValue=str(nValue))
+            
+        if hasattr(v,'fuel_level'):
+            nValue=v.fuel_level
+            if nValue != None:
+                Devices[base+DEVS['FUELLEVEL'][0]].Update(nValue=nValue, sValue=str(nValue))
+            
+        if hasattr(v,'fuel_driving_distance'):
+            nValue=v.fuel_driving_distance
+            if nValue != None:
+                Devices[base+DEVS['FUELRANGE'][0]].Update(nValue=nValue, sValue=str(nValue))
+            
+        if hasattr(v,'engine_is_running'):
+            value=v.engine_is_running
             if value != None:
-                nValue=value['vehicleLocation']['speed']['value']
+                nValue=0; sValue="Off"
+                if (value):
+                    nValue=1; sValue="On"
+                    self._engineOn=True
+                Devices[base+DEVS['ENGINEON'][0]].Update(nValue=nValue, sValue=sValue)
+            
+        if hasattr(v,'odometer'):
+            nValue=v.odometer
+            if nValue != None:
+                nValue=int(nValue)
+                Devices[base+DEVS['ODOMETER'][0]].Update(nValue=nValue, sValue=str(nValue))
+            
+            if (hasattr(v,'location_latitude') and v.location_latitude != None and (name not in self._vehicleLoc or (v.location_latitude!=self._vehicleLoc[name]['latitude'] and v.location_longitude!=self._vehicleLoc[name]['longitude']))):
+                # LOCATION changed or not previously set
+                # get address
+                get_address_url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&lat=' + str(v.location_latitude) + '&lon=' + str(v.location_longitude)
+                response = requests.get(get_address_url)
+                if response.status_code == 200:
+                    response = json.loads(response.text)
+                    locAddr=response['display_name']
+                    locMap = '<a href="http://www.google.com/maps/search/?api=1&query=' + str(v.location_latitude) + ',' + str(v.location_longitude) + '" target="_new"><em style="color:blue;">Map</em></a>'
+                    Domoticz.Log(f"Location address: {locAddr}")
+                    sValue=fill(locAddr, 40) + ' ' + locMap
+                    Devices[base+DEVS['LOCATION'][0]].Update(nValue=0, sValue=sValue)
+
+                # HOME DISTANCE: compute distance from home
+                homeloc=Settings['Location'].split(';')
+                distance=round(self.distance(v.location_latitude, v.location_longitude, float(homeloc[0]), float(homeloc[1])), 1)
+                Devices[base+DEVS['HOMEDIST'][0]].Update(nValue=0, sValue=str(distance))
+
+            if hasattr(v,'data'):
+                value=v.data
+                if value != None:
+                    nValue=value['vehicleLocation']['speed']['value']
+                    sValue=str(nValue)
+                    Devices[base+DEVS['SPEED'][0]].Update(nValue=nValue, sValue=sValue)
+                    Domoticz.Log(f"Vehicle {name} has odometer={v.odometer} speed={nValue} distance_from_home={distance} EV battery={batteryLevel}%")
+
+            # Reset force update button
+            Devices[base+DEVS['UPDATE'][0]].Update(nValue=0, sValue="Off")
+            
+        if hasattr(v,'air_control_is_on'):
+            value=v.air_control_is_on
+            if value != None:
+                nValue=1 if value else 0
+                sValue="On" if value else "Off"
+                Devices[base+DEVS['CLIMAON'][0]].Update(nValue=nValue, sValue=sValue)
+            
+        if hasattr(v,'defrost_is_on'):
+            value=v.defrost_is_on
+            if value != None:
+                nValue=1 if value else 0
+                sValue="On" if value else "Off"
+                Devices[base+DEVS['DEFROSTON'][0]].Update(nValue=nValue, sValue=sValue)
+            
+        if hasattr(v,'back_window_heater_is_on'):
+            value=v.back_window_heater_is_on
+            if value != None:
+                nValue=value
+                sValue="On" if value>0 else "Off"
+                Devices[base+DEVS['REARWINDOWON'][0]].Update(nValue=nValue, sValue=sValue)
+            
+        if hasattr(v,'steering_wheel_heater_is_on'):
+            value=v.steering_wheel_heater_is_on
+            if value != None:
+                nValue=value
+                sValue="On" if value>0 else "Off"
+                Devices[base+DEVS['STEERINGWHEELON'][0]].Update(nValue=nValue, sValue=sValue)
+
+        if hasattr(v,'side_mirror_heater_is_on'):
+            value=v.side_mirror_heater_is_on
+            if value != None:
+                nValue=1 if value else 0
+                sValue="On" if value else "Off"
+                Devices[base+DEVS['SIDEMIRRORSON'][0]].Update(nValue=nValue, sValue=sValue)
+            
+        if hasattr(v,'front_left_seat_status'):
+            sValue=v.front_left_seat_status
+            if sValue != None:
+                Devices[base+DEVS['SEATFL'][0]].Update(nValue=0, sValue=sValue)
+            
+        if hasattr(v,'front_right_seat_status'):
+            sValue=v.front_right_seat_status
+            if sValue != None:
+                Devices[base+DEVS['SEATFR'][0]].Update(nValue=0, sValue=sValue)
+            
+        if hasattr(v,'rear_left_seat_status'):
+            sValue=v.rear_left_seat_status
+            if sValue != None:
+                Devices[base+DEVS['SEATRL'][0]].Update(nValue=0, sValue=sValue)
+           
+        if hasattr(v,'rear_right_seat_status'):
+            sValue=v.rear_right_seat_status
+            if sValue != None:
+                Devices[base+DEVS['SEATRR'][0]].Update(nValue=0, sValue=sValue)
+            
+        if hasattr(v,'is_locked'):
+            value=v.is_locked
+            if value != None:
+                nValue=0 if value else 1
+                sValue="Locked" if value else "Unlocked"
+                Devices[base+DEVS['OPEN'][0]].Update(nValue=nValue, sValue=sValue)
+            
+        if hasattr(v,'trunk_is_open'):
+            value=v.trunk_is_open
+            if value != None:
+                nValue=1 if value else 0
+                sValue="Open" if value else "Closed"
+                Devices[base+DEVS['TRUNK'][0]].Update(nValue=nValue, sValue=sValue)
+            
+        if hasattr(v,'hood_is_open'):
+            value=v.hood_is_open
+            if value != None:
+                nValue=1 if value else 0
+                sValue="Open" if value else "Closed"
+                Devices[base+DEVS['HOOD'][0]].Update(nValue=nValue, sValue=sValue)
+            
+        if hasattr(v,'car_battery_percentage'):
+            nValue=v.car_battery_percentage
+            if nValue != None:
                 sValue=str(nValue)
-                Devices[base+DEVS['SPEED'][0]].Update(nValue=nValue, sValue=sValue)
-                Domoticz.Log(f"Vehicle {name} has odometer={v.odometer} speed={nValue} distance_from_home={distance} battery_level={batteryLevel}")
-
-        # Reset force update button
-        Devices[base+DEVS['UPDATE'][0]].Update(nValue=0, sValue="Off")
-        
-        value=v.air_control_is_on
-        if value != None:
-            nValue=1 if value else 0
-            sValue="On" if value else "Off"
-            Devices[base+DEVS['CLIMAON'][0]].Update(nValue=nValue, sValue=sValue)
-        
-        value=v.defrost_is_on
-        if value != None:
-            nValue=1 if value else 0
-            sValue="On" if value else "Off"
-            Devices[base+DEVS['DEFROSTON'][0]].Update(nValue=nValue, sValue=sValue)
-        
-        value=v.back_window_heater_is_on
-        if value != None:
-            nValue=value
-            sValue="On" if value>0 else "Off"
-            Devices[base+DEVS['REARWINDOWON'][0]].Update(nValue=nValue, sValue=sValue)
-        
-        value=v.steering_wheel_heater_is_on
-        if value != None:
-            nValue=value
-            sValue="On" if value>0 else "Off"
-            Devices[base+DEVS['STEERINGWHEELON'][0]].Update(nValue=nValue, sValue=sValue)
-
-        value=v.side_mirror_heater_is_on
-        if value != None:
-            nValue=1 if value else 0
-            sValue="On" if value else "Off"
-            Devices[base+DEVS['SIDEMIRRORSON'][0]].Update(nValue=nValue, sValue=sValue)
-        
-        sValue=v.front_left_seat_status
-        if sValue != None:
-            Devices[base+DEVS['SEATFL'][0]].Update(nValue=0, sValue=sValue)
-        
-        sValue=v.front_right_seat_status
-        if sValue != None:
-            Devices[base+DEVS['SEATFR'][0]].Update(nValue=0, sValue=sValue)
-        
-        sValue=v.rear_left_seat_status
-        if sValue != None:
-            Devices[base+DEVS['SEATRL'][0]].Update(nValue=0, sValue=sValue)
-       
-        sValue=v.rear_right_seat_status
-        if sValue != None:
-            Devices[base+DEVS['SEATRR'][0]].Update(nValue=0, sValue=sValue)
-        
-        value=v.is_locked
-        if value != None:
-            nValue=0 if value else 1
-            sValue="Locked" if value else "Unlocked"
-            Devices[base+DEVS['OPEN'][0]].Update(nValue=nValue, sValue=sValue)
-        
-        value=v.trunk_is_open
-        if value != None:
-            nValue=1 if value else 0
-            sValue="Open" if value else "Closed"
-            Devices[base+DEVS['TRUNK'][0]].Update(nValue=nValue, sValue=sValue)
-        
-        value=v.hood_is_open
-        if value != None:
-            nValue=1 if value else 0
-            sValue="Open" if value else "Closed"
-            Devices[base+DEVS['HOOD'][0]].Update(nValue=nValue, sValue=sValue)
-        
-        nValue=v.car_battery_percentage
-        if nValue != None:
-            sValue=str(nValue)
-            Devices[base+DEVS['12VBATT'][0]].Update(nValue=nValue, sValue=sValue)
-        
-        nValue=v.smart_key_battery_warning_is_on
-        if nValue != None:
-            sValue="Ok" if nValue == 0 else "Low"
-            Devices[base+DEVS['KEYBATT'][0]].Update(nValue=nValue, sValue=sValue)
-        
-        nValue=v.washer_fluid_warning_is_on
-        if nValue != None:
-            sValue="Ok" if nValue == 0 else "Empty"
-            Devices[base+DEVS['WASHER'][0]].Update(nValue=nValue, sValue=sValue)
-        
-        nValue=v.brake_fluid_warning_is_on
-        if nValue != None:
-            sValue="Ok" if nValue == 0 else "Empty"
-            Devices[base+DEVS['BRAKE'][0]].Update(nValue=nValue, sValue=sValue)
-        
-        nValue=v.tire_pressure_all_warning_is_on
-        if nValue != None:
-            sValue="Ok" if nValue == 0 else "Low"
-            Devices[base+DEVS['TIRES'][0]].Update(nValue=nValue, sValue=sValue)
+                Devices[base+DEVS['12VBATT'][0]].Update(nValue=nValue, sValue=sValue)
+            
+        if hasattr(v,'smart_key_battery_warning_is_on'):
+            nValue=v.smart_key_battery_warning_is_on
+            if nValue != None:
+                sValue="Ok" if nValue == 0 else "Low"
+                Devices[base+DEVS['KEYBATT'][0]].Update(nValue=nValue, sValue=sValue)
+            
+        if hasattr(v,'washer_fluid_warning_is_on'):
+            nValue=v.washer_fluid_warning_is_on
+            if nValue != None:
+                sValue="Ok" if nValue == 0 else "Empty"
+                Devices[base+DEVS['WASHER'][0]].Update(nValue=nValue, sValue=sValue)
+            
+        if hasattr(v,'brake_fluid_warning_is_on'):
+            nValue=v.brake_fluid_warning_is_on
+            if nValue != None:
+                sValue="Ok" if nValue == 0 else "Empty"
+                Devices[base+DEVS['BRAKE'][0]].Update(nValue=nValue, sValue=sValue)
+            
+        if hasattr(v,'tire_pressure_all_warning_is_on'):
+            nValue=v.tire_pressure_all_warning_is_on
+            if nValue != None:
+                sValue="Ok" if nValue == 0 else "Low"
+                Devices[base+DEVS['TIRES'][0]].Update(nValue=nValue, sValue=sValue)
 
     def distance(self, lat1, lon1, lat2, lon2):
         """ Compute the distance between two locations """
