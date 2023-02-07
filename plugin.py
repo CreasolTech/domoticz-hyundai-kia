@@ -10,7 +10,7 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.0.7" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.0.8" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
         <h2>Domoticz Hyundai Kia connect plugin</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about owned Hyundai and Kia vehicles, such as odometer, EV battery charge, 
@@ -242,7 +242,12 @@ class BasePlugin:
                     name = re.sub(r'\W+', '', v.name)   # must be unique and identify the type of car, if more than 1 car is owned
                     if name not in self._name2id:
                         self._name2id[name]=k   # save the corresponding between vehicle name and id in vm.vehicles dict
-                    Domoticz.Log(f"Name={name} Odometer={v._odometer_value}{v._odometer_unit} Battery={v.ev_battery_percentage}")
+                    if v.ev_battery_percentage == None:
+                        batterySOC=v.ev_battery_percentage
+                    else: 
+                        batterySOC=0
+                        
+                    Domoticz.Log(f"Name={name} Odometer={v._odometer_value}{v._odometer_unit} Battery={batterySOC}")
                     Domoticz.Log(f"Vehicle={v}")
                 
                     # base = Unit base = 0, 64, 128, 192 # up to 4 vehicles can be addressed, 64 devices per vehicle (Unit <= 255)
@@ -352,133 +357,161 @@ class BasePlugin:
         """ Add devices for car named {name}, starting from base unit {base}, using vehicle parameters in {v} """
         Domoticz.Log(f"Add devices for car {name} with base index {base}")
 
-        dev=DEVS['EVSTATE']; var=v.ev_battery_is_charging
-        if var != None and base+dev[0] not in Devices: 
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=19, Used=1).Create()
+        if v.ev_battery_is_charging != None:
+            dev=DEVS['EVSTATE']; var=v.ev_battery_is_charging
+            if var != None and base+dev[0] not in Devices: 
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=19, Used=1).Create()
+        if v.ev_battery_is_charging != None:
+            dev=DEVS['EVCHARGEON']; var=v.ev_battery_is_charging
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        dev=DEVS['EVCHARGEON']; var=v.ev_battery_is_charging
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+        if v.ev_battery_percentage != None:
+            dev=DEVS['EVBATTLEVEL']; var=v.ev_battery_percentage
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
 
-        dev=DEVS['EVBATTLEVEL']; var=v.ev_battery_percentage
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
+        if v.ev_driving_distance != None:
+            dev=DEVS['EVRANGE']; var=v.ev_driving_distance
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._ev_driving_distance_unit}, Used=1).Create()
 
-        dev=DEVS['EVRANGE']; var=v.ev_driving_distance
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._ev_driving_distance_unit}, Used=1).Create()
+        if v._ev_charge_limits.ac != None:
+            dev=DEVS['EVLIMITAC']; var=v._ev_charge_limits.ac
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=62, Switchtype=7, Used=1).Create()
 
-        dev=DEVS['EVLIMITAC']; var=v._ev_charge_limits.ac
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=62, Switchtype=7, Used=1).Create()
+        if v._ev_charge_limits.dc != None:
+            dev=DEVS['EVLIMITDC']; var=v._ev_charge_limits.dc
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=62, Switchtype=7, Used=1).Create()
 
-        dev=DEVS['EVLIMITDC']; var=v._ev_charge_limits.dc
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=62, Switchtype=7, Used=1).Create()
+        if v.fuel_level != None:
+            dev=DEVS['FUELLEVEL']; var=v.fuel_level
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
 
-        dev=DEVS['FUELLEVEL']; var=v.fuel_level
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
+        if v.fuel_driving_distance != None:
+            dev=DEVS['FUELRANGE']; var=v.fuel_driving_distance
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._fuel_driving_distance_unit}, Used=1).Create()
 
-        dev=DEVS['FUELRANGE']; var=v.fuel_driving_distance
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._fuel_driving_distance_unit}, Used=1).Create()
+        if v.engine_is_running != None:
+            dev=DEVS['ENGINEON']; var=v.engine_is_running
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        dev=DEVS['ENGINEON']; var=v.engine_is_running
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+        if v.odometer != None:
+            dev=DEVS['ODOMETER']; var=v.odometer
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=113, Subtype=0, Switchtype=3, Used=1).Create()
 
-        dev=DEVS['ODOMETER']; var=v.odometer
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=113, Subtype=0, Switchtype=3, Used=1).Create()
+        if v.location_latitude != None:
+            dev=DEVS['LOCATION']; var=v.location_latitude
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=19, Used=1).Create()
+            dev=DEVS['HOMEDIST']; var=v.location_latitude
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Used=1).Create()
 
-        dev=DEVS['LOCATION']; var=v.location_latitude
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=19, Used=1).Create()
-        
-        dev=DEVS['HOMEDIST']; var=v.location_latitude
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Used=1).Create()
-
-        dev=DEVS['SPEED']; var=v.data
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Used=1).Create()
-        
+        if v.data != None:
+            dev=DEVS['SPEED']; var=v.data
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Used=1).Create()
+            
         dev=DEVS['UPDATE']
         if base+dev[0] not in Devices:
             Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create() 
 
-        dev=DEVS['CLIMAON']; var=v.air_control_is_on
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+        if v.air_control_is_on != None:
+            dev=DEVS['CLIMAON']; var=v.air_control_is_on
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        dev=DEVS['CLIMATEMP']; var=v.air_temperature    # Thermostat
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=242, Subtype=1, Used=1).Create()
+        if v.air_temperature != None:
+            dev=DEVS['CLIMATEMP']; var=v.air_temperature    # Thermostat
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=242, Subtype=1, Used=1).Create()
 
-        dev=DEVS['DEFROSTON']; var=v.defrost_is_on
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+        if v.defrost_is_on != None:
+            dev=DEVS['DEFROSTON']; var=v.defrost_is_on
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        dev=DEVS['REARWINDOWON']; var=v.back_window_heater_is_on
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+        if v.back_window_heater_is_on != None:
+            dev=DEVS['REARWINDOWON']; var=v.back_window_heater_is_on
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        dev=DEVS['STEERINGWHEELON']; var=v.steering_wheel_heater_is_on
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+        if v.steering_wheel_heater_is_on != None:
+            dev=DEVS['STEERINGWHEELON']; var=v.steering_wheel_heater_is_on
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        dev=DEVS['SIDEMIRRORSON']; var=v.side_mirror_heater_is_on
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+        if v.side_mirror_heater_is_on != None:
+            dev=DEVS['SIDEMIRRORSON']; var=v.side_mirror_heater_is_on
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
 
-        dev=DEVS['SEATFL']; var=v.front_left_seat_status
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=19, Used=1).Create()
+        if v.front_left_seat_status != None:
+            dev=DEVS['SEATFL']; var=v.front_left_seat_status
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=19, Used=1).Create()
 
-        dev=DEVS['SEATFR']; var=v.front_right_seat_status
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=19, Used=1).Create()
+        if v.front_right_seat_status != None:
+            dev=DEVS['SEATFR']; var=v.front_right_seat_status
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=19, Used=1).Create()
 
-        dev=DEVS['SEATRL']; var=v.rear_left_seat_status
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=19, Used=1).Create()
+        if v.rear_left_seat_status != None:
+            dev=DEVS['SEATRL']; var=v.rear_left_seat_status
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=19, Used=1).Create()
 
-        dev=DEVS['SEATRR']; var=v.rear_right_seat_status
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=19, Used=1).Create()
+        if v.rear_right_seat_status != None:
+            dev=DEVS['SEATRR']; var=v.rear_right_seat_status
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=19, Used=1).Create()
 
-        dev=DEVS['OPEN']; var=v.is_locked
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Switchtype=19, Used=1).Create()
+        if v.is_locked != None:
+            dev=DEVS['OPEN']; var=v.is_locked
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Switchtype=19, Used=1).Create()
 
-        dev=DEVS['TRUNK']; var=v.trunk_is_open
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Switchtype=11, Used=1).Create()
+        if v.trunk_is_open != None:
+            dev=DEVS['TRUNK']; var=v.trunk_is_open
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Switchtype=11, Used=1).Create()
 
-        dev=DEVS['HOOD']; var=v.hood_is_open
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Switchtype=11, Used=1).Create()
+        if v.hood_is_open != None:
+            dev=DEVS['HOOD']; var=v.hood_is_open
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Switchtype=11, Used=1).Create()
 
-        dev=DEVS['12VBATT']; var=v.car_battery_percentage
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
+        if v.car_battery_percentage != None:
+            dev=DEVS['12VBATT']; var=v.car_battery_percentage
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
 
-        dev=DEVS['KEYBATT']; var=v.smart_key_battery_warning_is_on
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=22, Used=1).Create()
+        if v.smart_key_battery_warning_is_on != None:
+            dev=DEVS['KEYBATT']; var=v.smart_key_battery_warning_is_on
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=22, Used=1).Create()
 
-        dev=DEVS['WASHER']; var=v.washer_fluid_warning_is_on
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
+        if v.washer_fluid_warning_is_on != None:
+            dev=DEVS['WASHER']; var=v.washer_fluid_warning_is_on
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
 
-        dev=DEVS['BRAKE']; var=v.brake_fluid_warning_is_on
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
+        if v.brake_fluid_warning_is_on != None:
+            dev=DEVS['BRAKE']; var=v.brake_fluid_warning_is_on
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
 
-        dev=DEVS['TIRES']; var=v.tire_pressure_all_warning_is_on
-        if var != None and base+dev[0] not in Devices:
-            Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
+        if v.tire_pressure_all_warning_is_on != None:
+            dev=DEVS['TIRES']; var=v.tire_pressure_all_warning_is_on
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
 
     def updateDevices(self, base, name, v):
         """ Update devices for car named {name}, starting from base unit {base}, using vehicle parameters in {v} """

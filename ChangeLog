@@ -4,6 +4,9 @@ ChangeLog
 TODO:
 * set_charge_limits
 
+20230207 1.0.8
+Some fixes to handle hybrid cars without ev_* attributes
+
 20220908 1.0.7
 Word wrap on location device (long string with vehicle location address)
 Increased heartbeat interval to 30s
