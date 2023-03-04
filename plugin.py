@@ -10,7 +10,7 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.0.8" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.0.9" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
         <h2>Domoticz Hyundai Kia connect plugin</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
@@ -68,6 +68,7 @@ import requests
 from datetime import datetime
 from textwrap import fill
 from hyundai_kia_connect_api import *
+from hyundai_kia_connect_api.exceptions import *
 
 
 LANGS=[ "en", "it", "nl", "se", "hu", "pl", "fr" ] # list of supported languages, in DEVS dict below
@@ -223,16 +224,44 @@ class BasePlugin:
             elif self.mustPoll():   # check if vehicles data should be polled. return False if polling is already in progress 
                 self._lastPoll = datetime.now()
                 Domoticz.Log("check_and_refresh_token()...")
-                ret=self.vm.check_and_refresh_token()
+                #ret=self.vm.check_and_refresh_token()
+                try:
+                    self.vm.check_and_refresh_token()
+                except AuthenticationError as AuthError:
+                    Domoticz.Log(f"AuthError: {AuthError}")
+                except:
+                    Domoticz.Log(f"Unknown error")
+
+
+                Domoticz.Log("check_and_force_update_vehicles()...")
+                try:
+                    self.vm.check_and_force_update_vehicles(self.interval*60)
+                except Exception:
+                    try:
+                        self.vm.update_all_vehicles_with_cached_state()
+                    except Exception as err_nested:
+                        Domoticz.Log(f"Error communicating with API: {err_nested}")
+                        # retry again...
+                        Domoticz.Log("Retry again: check_and_refresh_token()...")
+                        self.vm.check_and_refresh_token()
+                        Domoticz.Log("Retry again: update_all_vehicles_with_cached_state()...")
+                        self.vm.update_all_vehicles_with_cached_state()  # update vehicles with state in the cloud, instead of forcing update from vehicles
+                    except:
+                        Domoticz.Log(f"Unknown error")
+
+
+
 #               self.vm.force_refresh_all_vehicles_states() # it does not update location and speed!
 #               Domoticz.Log(f"self.vm.force_refresh_all_vehicles_states()")
 #               ret=self.vm.check_and_force_update_vehicles(self.interval)     # suggested by fuatakgun
 #               Domoticz.Log(f"self.vm.check_and_force_update_vehicles({self.interval}) returned {ret}")
 #               self.vm.update_all_vehicles_with_cached_state()    # not needed
-                Domoticz.Log("force_refresh_all_vehicles_states()..")
-                self.vm.force_refresh_all_vehicles_states() # suggested by P.Levres: fetch data from vehicle to the cloud
-                Domoticz.Log("update_all_vehicles_with_cached_state()...")
-                self.vm.update_all_vehicles_with_cached_state()  # suggested by P.Levres: download data from the cloud
+
+
+#                Domoticz.Log("force_refresh_all_vehicles_states()..")
+#                self.vm.force_refresh_all_vehicles_states() # suggested by P.Levres: fetch data from vehicle to the cloud
+#                Domoticz.Log("update_all_vehicles_with_cached_state()...")
+#                self.vm.update_all_vehicles_with_cached_state()  # suggested by P.Levres: download data from the cloud
                 self._isCharging=False  # set to false: if one vehicle is charging, this flag will be set by updateDevices()
                 self._engineOn=False    # set to false: if one vehicle is moving,   this flag will be set by updateDevices()
                 # Now self.vm.vehicles contains a table with the list of registered vehicles and their parameters
