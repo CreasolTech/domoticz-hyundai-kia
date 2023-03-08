@@ -80,7 +80,7 @@ sudo apt install python3-dateutil
 
 #install original hyundai-kia-connect-api lib 
 # pip3 install hyundai-kia-connect-api
-#instead of the original version, install the version enhanced by jwefers
+pip3 install pytz bs4
 cd  /usr/local/src
 #git clone https://github.com/jwefers/hyundai_kia_connect_api.git  #lib modified by jWefers
 git clone https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api.git

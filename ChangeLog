@@ -1,13 +1,12 @@
 domoticz-hyundai-kia plugin
 ChangeLog
 
-TODO:
-* set_charge_limits
-
-20230220 1.0.9 ...........
-Needed the update lib:
+20230308 1.1.0 
+Needed the update lib to the latest version, original source:
 	cd /usr/local/src
 	git clone https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api.git
+
+Now setting AC/DC charge limit works.
 
 20230207 1.0.8
 Some fixes to handle hybrid cars without ev_* attributes
