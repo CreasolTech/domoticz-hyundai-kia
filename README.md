@@ -21,7 +21,7 @@ It's also possible to **control the car, activating for example the climate** fr
 
 Actually 30 devices will be created, using your language: English, Italian, Dutch, Swedish, Hungarian, Polish and French are supported, now, but if you want to contribute, just fetch the translation.txt file, add for each line the translation in your language, and send by email to linux AT creasol dot it.
 
-This plugin can be installed typing the following commands from a shell: instead of installing the plugin, (penultimate command),  **it's possible to use Python Plugin Manager or Python Plugins Manager** which also permit to update plugin easily or even automatically:
+This plugin can be installed typing the following commands from a shell: instead of installing the plugin, (penultimate command),  **it's possible to use Python Plugin Manager or Python Plugins Manager** which also permit to update plugin easily or even automatically.
 
 # Features
 * It's possible to configure 2 polling intervals, to limit accesses to the cloud (Kia Europe limit is 200 accesses/day): a standard interval, a shorter interval when driving (to track battery and position/speed), and a longer interval during the night computed as 4x polling interval, max 120 minutes).  The polling interval while charging is computed as interval_driving * 2.
@@ -60,6 +60,7 @@ More info at https://www.creasol.it/EVSE
 
 
 # Installation
+
 
 ```bash
 #become root user
@@ -101,9 +102,14 @@ git clone https://github.com/CreasolTech/domoticz-hyundai-kia
 service domoticz restart
 ```
 
+Before activating this plugin, assure that you've **set the right name to your car** (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.
+
+Also, **do not change the name of the ODOMETER device!**
+
 Then, enter Domoticz panel, go to Setup -> Hardware and enable the Hyundai Kia connect plugin specifying the Hyundai or Kia account credential: up to 4 vehicles associated to this account can be shown automatically on Domoticz.
 
 Please note that there are some restrictions on the number of daily access to the cloud... for example EU customers cannot connect more than 200 times/day
+Also, the vehicle consumes energy for every access, so **do not poll the car too often when it is not moving nor charging.**
 
 
 # Credits
