@@ -302,6 +302,7 @@ class BasePlugin:
                     Domoticz.Log("Force update command")
                     self._checkDevices = True
                     self._lastPoll = None
+                    self.interval=1
                     self.onHeartbeat()
             else:
                 #Update button has been switched OFF
@@ -716,39 +717,45 @@ class BasePlugin:
         elif hasattr(v,'_location_longitude'):
             lon=getattr(v, '_location_longitude')
 
-        if (lat!=None and lon!=None and (name not in self._vehicleLoc or (lat!=self._vehicleLoc[name]['latitude'] and lon!=self._vehicleLoc[name]['longitude']))):
-            # LOCATION changed or not previously set
-            # get address
-            if self.verbose: Domoticz.Log(f"Latitude or Longitude have changed")
-            get_address_url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&lat=' + str(lat) + '&lon=' + str(lon)
-            response = requests.get(get_address_url)
-            if response.status_code == 200:
-                response = json.loads(response.text)
-                locAddr=response['display_name']
-                locMap = '<a href="http://www.google.com/maps/search/?api=1&query=' + str(lat) + ',' + str(lon) + '" target="_new"><em style="color:blue;">Map</em></a>'
-                Domoticz.Log(f"Location address: {locAddr}")
-                sValue=fill(locAddr, 40) + ' ' + locMap
-                Devices[base+DEVS['LOCATION'][0]].Update(nValue=0, sValue=sValue)
+        if lat!=None and lon!=None:
+            if name not in self._vehicleLoc:
+                #initialize vehicleLoc
+                self._vehicleLoc[name]['latitude']=0
+                self._vehicleLoc[name]['longitude']=0
+            if lat!=self._vehicleLoc[name]['latitude'] or lon!=self._vehicleLoc[name]['longitude']:
+                # LOCATION changed or not previously set
+                # get address
+                if self.verbose: Domoticz.Log(f"Latitude or Longitude have changed")
+                get_address_url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&lat=' + str(lat) + '&lon=' + str(lon)
+                response = requests.get(get_address_url)
+                if response.status_code == 200:
+                    response = json.loads(response.text)
+                    locAddr=response['display_name']
+                    locMap = '<a href="http://www.google.com/maps/search/?api=1&query=' + str(lat) + ',' + str(lon) + '" target="_new"><em style="color:blue;">Map</em></a>'
+                    Domoticz.Log(f"Location address: {locAddr}")
+                    sValue=fill(locAddr, 40) + ' ' + locMap
+                    Devices[base+DEVS['LOCATION'][0]].Update(nValue=0, sValue=sValue)
 
-            # HOME DISTANCE: compute distance from home
-            homeloc=Settings['Location'].split(';')
-            distance=round(self.distance(lat, lon, float(homeloc[0]), float(homeloc[1])), 1)
-            Devices[base+DEVS['HOMEDIST'][0]].Update(nValue=0, sValue=str(distance))
+                # HOME DISTANCE: compute distance from home
+                homeloc=Settings['Location'].split(';')
+                distance=round(self.distance(lat, lon, float(homeloc[0]), float(homeloc[1])), 1)
+                Devices[base+DEVS['HOMEDIST'][0]].Update(nValue=0, sValue=str(distance))
 
-            if hasattr(v,'data'):
-                value=v.data
-                if value != None:
-                    nValue=value['vehicleLocation']['speed']['value']
-                    sValue=str(nValue)
-                    Devices[base+DEVS['SPEED'][0]].Update(nValue=nValue, sValue=sValue)
-                    Domoticz.Log(f"Vehicle {name} has odometer={v.odometer} speed={nValue} distance_from_home={distance} EV battery={batteryLevel}%")
+                if hasattr(v,'data'):
+                    value=v.data
+                    if value != None:
+                        nValue=value['vehicleLocation']['speed']['value']
+                        sValue=str(nValue)
+                        Devices[base+DEVS['SPEED'][0]].Update(nValue=nValue, sValue=sValue)
+                        Domoticz.Log(f"Vehicle {name} has odometer={v.odometer} speed={nValue} distance_from_home={distance} EV battery={batteryLevel}%")
 
-            self._vehicleLoc[name]['latitude']=lat
-            self._vehicleLoc[name]['longitude']=lon
-        else:
-            if self.verbose: Domoticz.Log(f"Latitude or Longitude NOT changed")
+                self._vehicleLoc[name]['latitude']=lat
+                self._vehicleLoc[name]['longitude']=lon
+            else:
+                if self.verbose: Domoticz.Log(f"Latitude or Longitude NOT changed: lat={lat}, lon={lon}")
+        else: 
+            if self.verbose: Domoticz.Log(f"Latitude or Longitude NOT found")
 
-            
         k='CLIMAON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Log(f"{k}={var}")
