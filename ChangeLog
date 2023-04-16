@@ -6,6 +6,9 @@ With new version of hyundai-kia-connect-api sometimes odometer does not
 appears, but the value of latitude, longitude and speed are returned
 correctly. Fixed this.
 
+Added self.verbose = True to get more info on the domoticz log. 
+Set to False to remove debugging info.
+
 20230308 1.1.0 
 Needed the update lib to the latest version, original source:
 	cd /usr/local/src
