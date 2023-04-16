@@ -10,9 +10,9 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.1.0" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.1.1" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
-        <h2>Domoticz Hyundai Kia connect plugin</h2>
+        <h2>Domoticz Hyundai Kia connect plugin - 1.1.1</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
         tyres status, door lock status, and much more.<br/>
         <b>Before activating this plugin, assure that you've set the right name to your car</b> (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.<br/>
@@ -137,6 +137,7 @@ class BasePlugin:
         self._vehicleLoc = {}           # saved location for vehicles
         self._name2id = {}
         self.vm = None
+        self.verbose=True                  # if 1 => add extra debugging messages. Default: False
 
     def getVehicleId(self, Unit):
             # get name and id for the vehicle associated to Devices[Unit]
@@ -451,9 +452,12 @@ class BasePlugin:
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=113, Subtype=0, Switchtype=3, Used=1).Create()
 
+
         k='LOCATION'; dev=DEVS[k]
         if hasattr(v, 'location_latitude'):
             dev[1] =  'location_latitude'
+        elif hasattr(v, '_location_latitude'):
+            dev[1] = '_location_latitude'
         if dev[1]!=None:
             var=getattr(v,dev[1], None)
             if var != None and base+dev[0] not in Devices:
@@ -644,29 +648,34 @@ class BasePlugin:
         if var != None:
             nValue=var
             batteryLevel=var
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
         
         k='EVRANGE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=int(var)
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
             
         k='EVLIMITAC'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=var
             if nValue != None:
+                if self.verbose: Domoticz.Log(f"{k}={var}")
                 Devices[base+dev[0]].Update(nValue=1, sValue=str(nValue))
             
         k='EVLIMITDC'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=var
             if nValue != None:
+                if self.verbose: Domoticz.Log(f"{k}={var}")
                 Devices[base+dev[0]].Update(nValue=1, sValue=str(nValue))
             
         k='FUELLEVEL'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=var
             if nValue != None:
+                if self.verbose: Domoticz.Log(f"{k}={var}")
                 Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
             
         k='FUELRANGE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
@@ -678,6 +687,7 @@ class BasePlugin:
         k='ENGINEON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             value=var
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             if value != None:
                 nValue=0; sValue="Off"
                 if (value):
@@ -686,29 +696,44 @@ class BasePlugin:
                 Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='ODOMETER'; dev=DEVS[k]; var=getattr(v, dev[1], None)
-        if var != None:
+        if var != None and var != 0:
             nValue=var
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             if nValue != None:
                 nValue=int(nValue)
                 Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
-            
-            if (hasattr(v,'location_latitude') and v.location_latitude != None and (name not in self._vehicleLoc or (v.location_latitude!=self._vehicleLoc[name]['latitude'] and v.location_longitude!=self._vehicleLoc[name]['longitude']))):
-                # LOCATION changed or not previously set
-                # get address
-                get_address_url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&lat=' + str(v.location_latitude) + '&lon=' + str(v.location_longitude)
-                response = requests.get(get_address_url)
-                if response.status_code == 200:
-                    response = json.loads(response.text)
-                    locAddr=response['display_name']
-                    locMap = '<a href="http://www.google.com/maps/search/?api=1&query=' + str(v.location_latitude) + ',' + str(v.location_longitude) + '" target="_new"><em style="color:blue;">Map</em></a>'
-                    Domoticz.Log(f"Location address: {locAddr}")
-                    sValue=fill(locAddr, 40) + ' ' + locMap
-                    Devices[base+DEVS['LOCATION'][0]].Update(nValue=0, sValue=sValue)
 
-                # HOME DISTANCE: compute distance from home
-                homeloc=Settings['Location'].split(';')
-                distance=round(self.distance(v.location_latitude, v.location_longitude, float(homeloc[0]), float(homeloc[1])), 1)
-                Devices[base+DEVS['HOMEDIST'][0]].Update(nValue=0, sValue=str(distance))
+
+        # get coordinates and compute distance    
+        lat=None
+        lon=None
+        if hasattr(v,'location_latitude'):
+            lat=getattr(v, 'location_latitude')
+        elif hasattr(v,'_location_latitude'):
+            lat=getattr(v, '_location_latitude')
+        if hasattr(v,'location_longitude'):
+            lon=getattr(v, 'location_longitude')
+        elif hasattr(v,'_location_longitude'):
+            lon=getattr(v, '_location_longitude')
+
+        if (lat!=None and lon!=None and (name not in self._vehicleLoc or (lat!=self._vehicleLoc[name]['latitude'] and lon!=self._vehicleLoc[name]['longitude']))):
+            # LOCATION changed or not previously set
+            # get address
+            if self.verbose: Domoticz.Log(f"Latitude or Longitude have changed")
+            get_address_url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&lat=' + str(lat) + '&lon=' + str(lon)
+            response = requests.get(get_address_url)
+            if response.status_code == 200:
+                response = json.loads(response.text)
+                locAddr=response['display_name']
+                locMap = '<a href="http://www.google.com/maps/search/?api=1&query=' + str(lat) + ',' + str(lon) + '" target="_new"><em style="color:blue;">Map</em></a>'
+                Domoticz.Log(f"Location address: {locAddr}")
+                sValue=fill(locAddr, 40) + ' ' + locMap
+                Devices[base+DEVS['LOCATION'][0]].Update(nValue=0, sValue=sValue)
+
+            # HOME DISTANCE: compute distance from home
+            homeloc=Settings['Location'].split(';')
+            distance=round(self.distance(lat, lon, float(homeloc[0]), float(homeloc[1])), 1)
+            Devices[base+DEVS['HOMEDIST'][0]].Update(nValue=0, sValue=str(distance))
 
             if hasattr(v,'data'):
                 value=v.data
@@ -718,11 +743,15 @@ class BasePlugin:
                     Devices[base+DEVS['SPEED'][0]].Update(nValue=nValue, sValue=sValue)
                     Domoticz.Log(f"Vehicle {name} has odometer={v.odometer} speed={nValue} distance_from_home={distance} EV battery={batteryLevel}%")
 
-            # Reset force update button
-            Devices[base+DEVS['UPDATE'][0]].Update(nValue=0, sValue="Off")
+            self._vehicleLoc[name]['latitude']=lat
+            self._vehicleLoc[name]['longitude']=lon
+        else:
+            if self.verbose: Domoticz.Log(f"Latitude or Longitude NOT changed")
+
             
         k='CLIMAON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             value=var
             if value != None:
                 nValue=1 if value else 0
@@ -731,95 +760,115 @@ class BasePlugin:
             
         k='DEFROSTON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=1 if var else 0
             sValue="On" if var else "Off"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='REARWINDOWON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=var
             sValue="On" if var>0 else "Off"
             Devices[base+DEVS['REARWINDOWON'][0]].Update(nValue=nValue, sValue=sValue)
             
         k='STEERINGWHEELON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=var
             sValue="On" if var>0 else "Off"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
 
         k='SIDEMIRRORSON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=1 if var else 0
             sValue="On" if var else "Off"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='SEATFL'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             sValue=var
             Devices[base+dev[0]].Update(nValue=0, sValue=sValue)
             
         k='SEATFR'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             sValue=var
             Devices[base+dev[0]].Update(nValue=0, sValue=sValue)
             
         k='SEATRL'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             sValue=var
             Devices[base+dev[0]].Update(nValue=0, sValue=sValue)
            
         k='SEATRR'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             sValue=var
             Devices[base+dev[0]].Update(nValue=0, sValue=sValue)
             
         k='OPEN'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=0 if var else 1
             sValue="Locked" if var else "Unlocked"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='TRUNK'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=1 if var else 0
             sValue="Open" if var else "Closed"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='HOOD'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=1 if var else 0
             sValue="Open" if var else "Closed"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='12VBATT'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=var
             sValue=str(nValue)
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='KEYBATT'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=var
             sValue="Ok" if nValue == 0 else "Low"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='WASHER'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=var
             sValue="Ok" if nValue == 0 else "Empty"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='BRAKE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=var
             sValue="Ok" if nValue == 0 else "Empty"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='TIRES'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
+            if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=var
             sValue="Ok" if nValue == 0 else "Low"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
+        
+        if self.verbose: Domoticz.Log(f"updateDevices() completed!")
+        # Reset force update button
+        Devices[base+DEVS['UPDATE'][0]].Update(nValue=0, sValue="Off")
 
     def distance(self, lat1, lon1, lat2, lon2):
         """ Compute the distance between two locations """
