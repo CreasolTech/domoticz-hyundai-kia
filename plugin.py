@@ -10,9 +10,9 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.1.1" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.1.2" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
-        <h2>Domoticz Hyundai Kia connect plugin - 1.1.1</h2>
+        <h2>Domoticz Hyundai Kia connect plugin - 1.1.2</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
         tyres status, door lock status, and much more.<br/>
         <b>Before activating this plugin, assure that you've set the right name to your car</b> (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.<br/>
@@ -231,10 +231,10 @@ class BasePlugin:
                 except:
                     Domoticz.Log(f"Unknown error")
 
-                Domoticz.Log(f"*** check_and_force_update_vehicles({self.interval*60})...")
+                Domoticz.Log(f"*** check_and_force_update_vehicles({self.interval*30})...")
                 #Domoticz.Log(f"*** force_refresh_all_vehicles_states()...")
                 try:
-                    self.vm.check_and_force_update_vehicles(self.interval*60)  # get state from cloud if fresh (less than interval minutes), or automatically request a car upate
+                    self.vm.check_and_force_update_vehicles(self.interval*30)  # get state from cloud if fresh (less than interval minutes), or automatically request a car upate
                     #self.vm.force_refresh_all_vehicles_states()  # get state from cloud if fresh (less than interval minutes), or automatically request a car upate
                 except Exception:
                     Domoticz.Log(f"Exception")
@@ -720,8 +720,8 @@ class BasePlugin:
         if lat!=None and lon!=None:
             if name not in self._vehicleLoc:
                 #initialize vehicleLoc
-                self._vehicleLoc[name]['latitude']=0
-                self._vehicleLoc[name]['longitude']=0
+                self._vehicleLoc[name]={'latitude': lat, 'longitude': lon+0.000001} # initialize variable but force a minimum variation to compute the real position
+
             if lat!=self._vehicleLoc[name]['latitude'] or lon!=self._vehicleLoc[name]['longitude']:
                 # LOCATION changed or not previously set
                 # get address
@@ -876,6 +876,7 @@ class BasePlugin:
         if self.verbose: Domoticz.Log(f"updateDevices() completed!")
         # Reset force update button
         Devices[base+DEVS['UPDATE'][0]].Update(nValue=0, sValue="Off")
+        
 
     def distance(self, lat1, lon1, lat2, lon2):
         """ Compute the distance between two locations """

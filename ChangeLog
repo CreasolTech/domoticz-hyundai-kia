@@ -1,6 +1,10 @@
 domoticz-hyundai-kia plugin
 ChangeLog
 
+20230422 1.1.2
+BugFix: when device started, vehicle location is initialize to a value distant
+few meters from the real one to force compute the current position
+
 20230416 1.1.1
 With new version of hyundai-kia-connect-api sometimes odometer does not
 appears, but the value of latitude, longitude and speed are returned
