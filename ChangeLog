@@ -1,6 +1,17 @@
 domoticz-hyundai-kia plugin
 ChangeLog
 
+20231001 1.1.3
+Following changes were done:
+1) some device descriptions extended
+2) three new devices added : power consumed, estimated charge duration, target charge range
+3) pollintervals changed from float to int
+4) changed the api calls to ensure full set of data points is returned
+5) added underscore to search labels fueld_driving-range and air_temperature
+6) corrected device types 244/19 to 243/19 and 243/6 to 243/22
+7) code optimisation, removed unnecessary if-statements
+8) added update of climatemp device
+
 20230422 1.1.2
 BugFix: when device started, vehicle location is initialize to a value distant
 few meters from the real one to force compute the current position
