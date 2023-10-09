@@ -1,6 +1,10 @@
 domoticz-hyundai-kia plugin
 ChangeLog
 
+20231009 1.1.4.
+Add total_power_regenerated device and data update
+Note: this does require latest version of hyundai-kia-connect-api as well, otherwise field will not be present
+
 20231001 1.1.3
 Following changes were done:
 1) some device descriptions extended
