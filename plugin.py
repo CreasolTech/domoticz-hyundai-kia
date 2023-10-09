@@ -6,7 +6,7 @@
 #
 # Source:  https://github.com/CreasolTech/domoticz-hyundai-kia.git
 # Author:  CreasolTech ( https://www.creasol.it/domotics )
-# Contributor: WillemD61 version 1.1.3
+# Contributor: WillemD61 version 1.1.4
 # License: MIT
 #
 
@@ -121,7 +121,7 @@ DEVS={ #topic:      [ num, "devname", "en name", "it name", "nl name", "se name"
     "EVPWRCONSUMED": [ 34, None, "EV Power Consumed", "","energieverbruik", "", "", "", "", "" ],
     "EVESTCHGDURATION": [ 35, None, "Est. Charge Duration", "", "oplaadduur", "", "", "", "", "" ],
     "EVTARGETCHGRANGE": [ 36, None, "Target Charge Range", "", "doelactieradius", "", "", "", "", "" ],
-
+    "EVPWRREGENERATED": [ 37, None, "EV Power Regenerated", "","energie gegenereerd", "", "", "", "", "" ],
 }
 
 class BasePlugin:
@@ -652,7 +652,14 @@ class BasePlugin:
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._ev_target_range_charge_AC_unit}, Used=1).Create()
 
-
+        k='EVPWRREGENERATED'; dev=DEVS[k]
+        if hasattr(v, 'total_power_regenerated'):
+            dev[1] =  'total_power_regenerated'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None)
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=113, Subtype=0, Switchtype=0, Used=1).Create()
+    
     def updateDevices(self, base, name, v):
         """ Update devices for car named {name}, starting from base unit {base}, using vehicle parameters in {v} """
         Domoticz.Log(f"Car found at base {base}")
@@ -921,6 +928,13 @@ class BasePlugin:
         if var != None:
             nValue=int(var)
             if self.verbose: Domoticz.Log(f"{k}={var}")
+            Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
+
+        k='EVPWRREGENERATED'; dev=DEVS[k]; var=getattr(v, dev[1], None)
+        if var != None and var != 0:
+            nValue=var
+            if self.verbose: Domoticz.Log(f"{k}={var}")
+            nValue=int(nValue)
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
         
         if self.verbose: Domoticz.Log(f"updateDevices() completed!")
