@@ -4,16 +4,16 @@
 # Hyundai Kia plugin
 # Based on hyundai-kia-connect-api by Fuat Akgun and BlUVO domoticz plugin by Pierre Levres
 #
-# Source:  https://github.com/CreasolTech/domoticz-hyundai-kia.git
-# Author:  CreasolTech ( https://www.creasol.it/domotics )
-# Contributor: WillemD61 version 1.1.4
+# Source:   https://github.com/CreasolTech/domoticz-hyundai-kia.git
+# Authors:  CreasolTech ( https://www.creasol.it/domotics )
+#           WillemD61 ()
 # License: MIT
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech" version="1.1.3" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="1.1.4" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
-        <h2>Domoticz Hyundai Kia connect plugin - 1.1.2</h2>
+        <h2>Domoticz Hyundai Kia connect plugin - 1.1.4</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
         tyres status, door lock status, and much more.<br/>
         <b>Before activating this plugin, assure that you've set the right name to your car</b> (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.<br/>

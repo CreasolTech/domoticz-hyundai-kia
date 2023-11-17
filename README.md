@@ -1,7 +1,8 @@
 # Domoticz Hyundai-Kia plugin - Controls and monitors Hyundai and Kia connected vehicles
-Author: Creasol https://www.creasol.it/domotics
+Authors:
+* Creasol https://www.creasol.it/domotics
+* WillemD61
 
-For any support request, please write to linux at creasol dot it or enter the Telegram DomBus group https://t.me/DomBus 
 
 [![Kia floorplan in Domoticz, simple example made in 10 minutes](https://images.creasol.it/kia-e-niro_domoticz_floorplan.webp)](https://www.creasol.it/EVSE)
 
@@ -31,32 +32,6 @@ This plugin can be installed typing the following commands from a shell: instead
 * Also, permits to monitor the distance from home and have a map and address of the car location.
 
 * It's possible to set the climate temperature and activate climate from Domoticz. In this way it's easy, for example, to create a scene that enable EVSE (charging station) and vehicle climate for 15 minutes, for example, to pre-heat the vehicle in the winter morning before going to work.
-
-
-## Charging the electric car in a smart way
-
-Creasol has developed a **cheap and smart DIY EVSE module** that can work stand-alone or connected to Domoticz.
-
-[![Video showing electric vehicle charging by Domoticz and Creasol DomBusEVSE module](https://images.creasol.it/youtube_small.png) Video showing electric car charging by Domoticz and DomBusEVSE module](https://www.youtube.com/watch?v=fyDtGO6S1UI)
-
-Features:
-* detects plug connection and disconnection
-* detects when the electric vehicle starts and stops charging
-* detects alarms from vehicle
-* interfaces a bidirectional energy meter to know the real time import or export power from grid
-* operates as __stand-alone__ (no need for a domotic controller) with the possibility to select two charging mode:
-    1. __use the maximum power allowed by electricity meter__, preventing overloads and disconnections, without exceeding the power supported by the charging cable
-    2. __use only renewable energy (keep import power around 0W)__
-
-* operates in a __controlled mode, with Domoticz__ home automation system: in this case it's possible to 
-	1. easily set the __minimum and maximum battery level__
-	2. easily set the __maximum charging current__
-	3. __when battery level is below minimum, charge at the max power__ permitted by the electricity meter (in Italy, alternates 90 minutes at maximum power + 27% and 90 minutes at maximum power + 10%, ___it's not possible to charge faster!___ The electrical system must be checked carefully when using maximum power, to avoid overheating and fires!!)
-	4. __when battery level is between minimum and maximum, charge using only power from renewable energy__ (from photovoltaic) keeping 0W imported from the grid.
-
-More info at https://www.creasol.it/EVSE
-
-[![Video about Creasol DomBus modules for Domoticz](https://images.creasol.it/youtube_small.png) Video about DomBus modules](https://youtu.be/QfkT5J5FWoM)
 
 
 ## Installation
@@ -124,6 +99,33 @@ Many thanks for the following language translations:
 
 
 ***
+
+# Charging the electric car in a smart way
+
+Creasol has developed a **cheap and smart DIY EVSE module** that can work stand-alone or connected to Domoticz.
+
+[![Video showing electric vehicle charging by Domoticz and Creasol DomBusEVSE module](https://images.creasol.it/youtube_small.png) Video showing electric car charging by Domoticz and DomBusEVSE module](https://www.youtube.com/watch?v=fyDtGO6S1UI)
+
+Features:
+* detects plug connection and disconnection
+* detects when the electric vehicle starts and stops charging
+* detects alarms from vehicle
+* interfaces a bidirectional energy meter to know the real time import or export power from grid
+* operates as __stand-alone__ (no need for a domotic controller) with the possibility to select two charging mode:
+    1. __use the maximum power allowed by electricity meter__, preventing overloads and disconnections, without exceeding the power supported by the charging cable
+    2. __use only renewable energy (keep import power around 0W)__
+
+* operates in a __controlled mode, with Domoticz__ home automation system: in this case it's possible to 
+	1. easily set the __minimum and maximum battery level__
+	2. easily set the __maximum charging current__
+	3. __when battery level is below minimum, charge at the max power__ permitted by the electricity meter (in Italy, alternates 90 minutes at maximum power + 27% and 90 minutes at maximum power + 10%, ___it's not possible to charge faster!___ The electrical system must be checked carefully when using maximum power, to avoid overheating and fires!!)
+	4. __when battery level is between minimum and maximum, charge using only power from renewable energy__ (from photovoltaic) keeping 0W imported from the grid.
+
+More info at https://www.creasol.it/EVSE
+
+[![Video about Creasol DomBus modules for Domoticz](https://images.creasol.it/youtube_small.png) Video about DomBus modules](https://youtu.be/QfkT5J5FWoM)
+
+
 
 ## Creasol DomBus modules
 Our industrial and home automation modules are designed to be
