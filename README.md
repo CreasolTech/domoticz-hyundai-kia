@@ -87,6 +87,37 @@ Then, enter Domoticz panel, go to Setup -> Hardware and enable the Hyundai Kia c
 Please note that there are some restrictions on the number of daily access to the cloud... for example EU customers cannot connect more than 200 times/day
 Also, the vehicle consumes energy for every access, so **do not poll the car too often when it is not moving nor charging.**
 
+## Updating
+
+Sometimes a new version of this plugin also requires an update of the hyundai_kia_connect_api.
+
+Assuming you followed the installation instructions as described above, the hyundai_kia_connect_api can be updated to the latest version with the following commands:
+
+```
+ cd /usr/local/src/hyundai_kia_connect_api/hyundai_kia_connect_api
+ sudo git pull
+```
+
+To update the plugin itself:
+
+```
+  cd /home/pi/domoticz/plugins/HyundaiKiaConnect
+  sudo git pull
+  sudo service domoticz restart
+```
+
+In case the plugin has been updated by the Domoticz plugin manager already, the git pull command will complain that the plugin already has been updated. This can be corrected with the following command:
+
+```
+   sudo git checkout ./plugin.py
+```
+
+After this the plugin can be updated with:
+```
+  sudo git pull
+  sudo service domoticz restart
+```
+
 
 ## Credits
 Many thanks for the following language translations:
