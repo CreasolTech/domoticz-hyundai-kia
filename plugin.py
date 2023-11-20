@@ -205,7 +205,7 @@ class BasePlugin:
 
     def onHeartbeat(self):
         """ Called every 10 seconds or other interval set by Domoticz.Heartbeat() """
-        Domoticz.Log("onHeartbeat()") 
+        Domoticz.Debug("onHeartbeat()") 
         if self._fetchingData == 0:
             #it's not fetching data from cloud
             if (self._setChargeLimits&15) != 0: #_setChargeLimits=0bzyxw0010  where if w is set => changed limits for vehicle with base=0, x=1 => vehicle with base=64, ....
