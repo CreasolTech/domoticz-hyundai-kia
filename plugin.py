@@ -76,6 +76,7 @@ from hyundai_kia_connect_api.exceptions import *
 LANGS=[ "en", "it", "nl", "se", "hu", "pl", "fr" ] # list of supported languages, in DEVS dict below
 LANGBASE=2  # item in the DEVS list where the first language starts 
 
+UNITMASK=63 # Unit for each car starts from 1, 65, 129, 193 (max 4 vehicles)
 
 #Dutch translation by Branko
 #Swedish translation by Joakim W.
@@ -139,7 +140,7 @@ class BasePlugin:
         self._engineOn = False
         self._lang = "en"
         self._vehicleLoc = {}           # saved location for vehicles
-        self._name2id = {}
+
         self.vm = None
         self.verbose=True                  # if 1 => add extra debugging messages. Default: False
 
@@ -148,15 +149,15 @@ class BasePlugin:
             vehicleId = False
             Domoticz.Log(f"Device Name={Devices[Unit].Name}")
             name=re.findall(f"{Parameters['Name']} - ([a-zA-Z0-9-_]+) .*", Devices[Unit].Name)[0]
-            if self._name2id == {}:
+            if self._name2vehicleId == {}:
                 # call onHeartbeat to load vehicles data
-                Domoticz.Log("_name2id is empty => call onHeartBeat to init vehicles data")
+                Domoticz.Log("_name2vehicleId is empty => call onHeartBeat to init vehicles data")
                 self.checkDevices = True
                 self._lastPoll = None
                 self.onHeartbeat()
 
-            if name in self._name2id:
-                vehicleId=self._name2id[name]
+            if name in self._name2vehicleId:
+                vehicleId=self._name2vehicleId[name]
                 Domoticz.Log(f"name={name} vehicleId={vehicleId} Unit={Unit}")
             else:
                 # vehicleId not found
@@ -208,7 +209,7 @@ class BasePlugin:
         Domoticz.Debug("onHeartbeat()") 
         if self._fetchingData == 0:
             #it's not fetching data from cloud
-            if (self._setChargeLimits&15) != 0: #_setChargeLimits=0bzyxw0010  where if w is set => changed limits for vehicle with base=0, x=1 => vehicle with base=64, ....
+            if (self._setChargeLimits&15) != 0: #_setChargeLimits=0bzyxw0010  where if w is set => changed limits for vehicle with base=0, x=1 => vehicle with base=UNITMASK+1 (64), ....
                 self._setChargeLimits-=1
                 if (self._setChargeLimits&15)==0:
                     bases=self._setChargeLimits&(~15)
@@ -223,7 +224,7 @@ class BasePlugin:
                                 Domoticz.Log(f"Set charge limits for device Unit={Unit}, AC={ac}, DC={dc}")
                                 ret=self.vm.set_charge_limits(vehicleId, ac, dc)
                         bases>>=1
-                        base+=64   # is next base 
+                        base+=UNITMASK+1   # is next base 
             elif self.mustPoll():   # check if vehicles data should be polled. return False if polling is already in progress 
                 self._lastPoll = datetime.now()
                 Domoticz.Log("*** check_and_refresh_token()...")
@@ -252,8 +253,8 @@ class BasePlugin:
                     # k is the keyword associated to a Vehicle object
                     v = self.vm.get_vehicle(k)
                     name = re.sub(r'\W+', '', v.name)   # must be unique and identify the type of car, if more than 1 car is owned
-                    if name not in self._name2id:
-                        self._name2id[name]=k   # save the corresponding between vehicle name and id in vm.vehicles dict
+                    if name not in self._name2vehicleId:
+                        self._name2vehicleId[name]=k   # save the corresponding between vehicle name and id in vm.vehicles dict
                     if hasattr(v,'v.ev_battery_percentage') and v.ev_battery_percentage != None:
                         batterySOC=v.ev_battery_percentage
                     else: 
@@ -269,7 +270,7 @@ class BasePlugin:
                     # base = Unit base = 0, 64, 128, 192 # up to 4 vehicles can be addressed, 64 devices per vehicle (Unit <= 255)
                     # Find the right Unit for the current car
                     baseFree = 256
-                    for base in range(0, 256-1, 64):
+                    for base in range(0, 256-1, UNITMASK+1):
                         if base+(DEVS['ODOMETER'][0]) in Devices:
                             if name in Devices[base+(DEVS['ODOMETER'][0])].Name:   
                                 # odometer exists: check that Domoticz device name correspond with vehicle name (set on Kia connect)
@@ -301,7 +302,7 @@ class BasePlugin:
 
     def onCommand(self, Unit, Command, Level, Hue):
         Domoticz.Log(f"onCommand(Unit={Unit}, Command={Command}, Level={Level}, Hue={Hue})")
-        if (Unit&63) == DEVS["UPDATE"][0]:  #force status update
+        if (Unit&UNITMASK) == DEVS["UPDATE"][0]:  #force status update
             Devices[Unit].Update(nValue=1 if Command=="On" else 0, sValue=Command)
             if Command=="On":
                 if self._fetchingData == 0:
@@ -319,10 +320,10 @@ class BasePlugin:
                 Domoticz.Log("vehicleId not found => ignore command")
                 return  # vehicleId not found
 
-            if (Unit&63) == DEVS["CLIMAON"][0]:   # start/stop climate control
+            if (Unit&UNITMASK) == DEVS["CLIMAON"][0]:   # start/stop climate control
                 if Command == "On":
                     options=ClimateRequestOptions()
-                    options.set_temp=float(Devices[(Unit&(~63))+DEVS["CLIMATEMP"][0]].sValue)
+                    options.set_temp=float(Devices[(Unit&(~UNITMASK))+DEVS["CLIMATEMP"][0]].sValue)
                     if options.set_temp<15:
                         options.set_temp=15
                     elif options.set_temp>27:
@@ -336,14 +337,14 @@ class BasePlugin:
                     ret=self.vm.stop_climate(vehicleId)
                     Domoticz.Log(f"stop_climate() returned {ret}")
                     Devices[Unit].Update(nValue=0, sValue="Off")
-            elif (Unit&63) == DEVS["CLIMATEMP"][0]:   # air temperature
+            elif (Unit&UNITMASK) == DEVS["CLIMATEMP"][0]:   # air temperature
                 airTemp=float(Level)
                 if airTemp<15: 
                     airTemp=15
                 elif airTemp>27: 
                     airTemp=27
                 Devices[Unit].Update(nValue=0, sValue=str(airTemp))
-            elif (Unit&63) == DEVS["OPEN"][0]:   # open/close
+            elif (Unit&UNITMASK) == DEVS["OPEN"][0]:   # open/close
                 if Command == "On": # => lock
                     Domoticz.Log(f"lock command")
                     ret=self.vm.lock(vehicleId)
@@ -352,14 +353,14 @@ class BasePlugin:
                     Domoticz.Log(f"unlock command")
                     ret=self.vm.unlock(vehicleId)
                     Devices[Unit].Update(nValue=0, sValue="Off")
-            elif (Unit&63) == DEVS["EVLIMITAC"][0] or (Unit&63) == DEVS["EVLIMITDC"][0]:
+            elif (Unit&UNITMASK) == DEVS["EVLIMITAC"][0] or (Unit&UNITMASK) == DEVS["EVLIMITDC"][0]:
                 # Battery limit was changed: send new value to the car
                 self._setChargeLimits=1  # set charge limits after 2*HeartBeat 
                 self._setChargeLimits|=16<<(Unit>>6)    #store in setChargeLimits which devices have been changed 0bzyxw0010 where w=1 if base=0, x=1 if base=64, y=1 if base=128, ...
                 Level=Level-Level%10    # Level should be 0, 10, 20, 30, ...
                 Domoticz.Log(f"New value={Level}")
                 Devices[Unit].Update(nValue=1, sValue=str(Level))
-            elif (Unit&63) == DEVS["EVCHARGEON"][0]:    # Start or stop charging
+            elif (Unit&UNITMASK) == DEVS["EVCHARGEON"][0]:    # Start or stop charging
                 if Command == "On":
                     Domoticz.Log(f"Received command to start charging")
                     Devices[Unit].Update(nValue=1, sValue="On")

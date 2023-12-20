@@ -81,6 +81,7 @@ service domoticz restart
 Before activating this plugin, assure that you've **set the right name to your car** (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.
 
 Also, **do not change the name of the ODOMETER device!**
+If you have to rename a device, **do not remove the name of the car** in the device name. Device names must be like "Kia - eNiro blablabla" where "Kia" is the name of plugin, "eNiro" is the name of the car registered in Kia Connect, and blablabla is the type of device, that can be changed as you preferred if device is not odometer.
 
 Then, enter Domoticz panel, go to Setup -> Hardware and enable the Hyundai Kia connect plugin specifying the Hyundai or Kia account credential: up to 4 vehicles associated to this account can be shown automatically on Domoticz.
 
