@@ -140,6 +140,7 @@ class BasePlugin:
         self._engineOn = False
         self._lang = "en"
         self._vehicleLoc = {}           # saved location for vehicles
+        self._name2vehicleId = {}
 
         self.vm = None
         self.verbose=True                  # if 1 => add extra debugging messages. Default: False
