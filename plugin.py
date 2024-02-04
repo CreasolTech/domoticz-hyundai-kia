@@ -119,10 +119,10 @@ DEVS={ #topic:      [ num, "devname", "en name", "it name", "nl name", "se name"
     "EVLIMITAC": [ 31, None, "Charge limit AC", "Limite ricarica AC", "", "", "", "", "", "" ],
     "EVLIMITDC": [ 32, None, "Charge limit DC", "Limite ricarica DC", "", "", "", "", "", "" ],
     "EVCHARGEON": [ 33, None, "EV Charging", "In ricarica", "", "", "", "", "", "" ],
-    "EVPWRCONSUMED": [ 34, None, "EV Power Consumed", "","energieverbruik", "", "", "", "", "" ],
+    "EVPWRCONSUMED": [ 34, None, "EV Power Consumed 90d", "","energieverbruik 90d", "", "", "", "", "" ],
     "EVESTCHGDURATION": [ 35, None, "Est. Charge Duration", "", "oplaadduur", "", "", "", "", "" ],
     "EVTARGETCHGRANGE": [ 36, None, "Target Charge Range", "", "doelactieradius", "", "", "", "", "" ],
-    "EVPWRREGENERATED": [ 37, None, "EV Power Regenerated", "","energie gegenereerd", "", "", "", "", "" ],
+    "EVPWRREGENERATED": [ 37, None, "EV Power Regenerated 90d", "","energie teruggewonnen 90d", "", "", "", "", "" ],
 }
 
 class BasePlugin:
