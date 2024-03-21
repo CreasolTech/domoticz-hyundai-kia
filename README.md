@@ -128,9 +128,12 @@ More info at https://www.creasol.it/EVSE
 
 [![Video about Creasol DomBus modules for Domoticz](https://images.creasol.it/youtube_small.png) Video about DomBus modules](https://youtu.be/QfkT5J5FWoM)
 
-
+***
 
 ## Creasol DomBus modules
+
+Below a list of modules, produced in Europe by Creasol, designed for Domoticz to be reliable and optimized for very very low power consumption.
+
 Our industrial and home automation modules are designed to be
 * very low power (**around 10mW with relays OFF**)
 * reliable (**no disconnections**)
