@@ -85,6 +85,8 @@ When plugin is activated, more than 30 devices will be automatically added to do
 
 If you want to rename a device, change only the {device name} part, **do not change the {PLUGIN_NAME} - {VEHICLE_NAME} part of device name** because it's used by the plugin to associate device name to a vehicle_name and vehicle_id provided by the cloud. Also, **do not change the name of the ODOMETER device**: leave this device name as original!
 
+Make sure that the plugin is also run shortly before midnight (in addition to the polling intervals configured) by adding a timer setting to the switch device that can be use to force a data update. For example add a timer that sets the switch to status "On" every weekday at 23:57.
+
 Then, enter Domoticz panel, go to Setup -> Hardware and enable the Hyundai Kia connect plugin specifying the Hyundai or Kia account credential: up to 4 vehicles associated to this account can be shown automatically on Domoticz.
 
 Please note that there are some restrictions on the number of daily access to the cloud... for example EU customers cannot connect more than 200 times/day
