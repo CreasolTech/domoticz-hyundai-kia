@@ -1,6 +1,13 @@
 domoticz-hyundai-kia plugin
 ChangeLog
 
+20230331 1.1.5
+The power consumed and power generated devices from 1.1.4. are renamed to clearly show that those only show 90-day data as provided by the Hyundai-Kia cloud.
+Two new devices are added to show the all-time totals of the power consumed and power generated.
+To track all-time totals the daily total of today is loaded onto incremental counters.
+To avoid double counting when running multiple times per day, each time it is checked what the current counterToday is, so only the additional increment
+is then added. The plugin should also be run shortly before midnight to collect latest daily total.
+
 20231009 1.1.4
 Add total_power_regenerated device and data update
 Note: this does require latest version of hyundai-kia-connect-api as well, otherwise field will not be present
