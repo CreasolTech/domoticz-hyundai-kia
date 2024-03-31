@@ -11,9 +11,9 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="1.1.4" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="1.1.5" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
-        <h2>Domoticz Hyundai Kia connect plugin - 1.1.4</h2>
+        <h2>Domoticz Hyundai Kia connect plugin - 1.1.5</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
         tyres status, door lock status, and much more.<br/>
         <b>Before activating this plugin, assure that you've set the right name to your car</b> (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.<br/>
@@ -44,6 +44,8 @@
                 <option label="60 minutes" value="60" />
                 <option label="120 minutes" value="120" default="true" />
                 <option label="240 minutes" value="240" />
+                <option label="480 minutes" value="480" />
+                <option label="720 minutes" value="720" />
             </options>
         </param>
         <param field="Mode2" label="Poll interval while driving">
@@ -67,11 +69,13 @@ import logging
 from math import cos, asin, sqrt, pi
 import time
 import requests
-from datetime import datetime
+from datetime import date,datetime
 from textwrap import fill
 from hyundai_kia_connect_api import *
 from hyundai_kia_connect_api.exceptions import *
 
+DomoticzIP="127.0.0.1"
+DomoticzPort="8080"
 
 LANGS=[ "en", "it", "nl", "se", "hu", "pl", "fr" ] # list of supported languages, in DEVS dict below
 LANGBASE=2  # item in the DEVS list where the first language starts 
@@ -119,10 +123,12 @@ DEVS={ #topic:      [ num, "devname", "en name", "it name", "nl name", "se name"
     "EVLIMITAC": [ 31, None, "Charge limit AC", "Limite ricarica AC", "", "", "", "", "", "" ],
     "EVLIMITDC": [ 32, None, "Charge limit DC", "Limite ricarica DC", "", "", "", "", "", "" ],
     "EVCHARGEON": [ 33, None, "EV Charging", "In ricarica", "", "", "", "", "", "" ],
-    "EVPWRCONSUMED": [ 34, None, "EV Power Consumed 90d", "","energieverbruik 90d", "", "", "", "", "" ],
+    "EVPWRCONS90DAYS": [ 34, None, "EV Power Cons.90d", "","EV verbruik 90d", "", "", "", "", "" ],
     "EVESTCHGDURATION": [ 35, None, "Est. Charge Duration", "", "oplaadduur", "", "", "", "", "" ],
     "EVTARGETCHGRANGE": [ 36, None, "Target Charge Range", "", "doelactieradius", "", "", "", "", "" ],
-    "EVPWRREGENERATED": [ 37, None, "EV Power Regenerated 90d", "","energie teruggewonnen 90d", "", "", "", "", "" ],
+    "EVPWRREGEN90DAYS": [ 37, None, "EV Power Regen.90d", "","EV opwek 90d", "", "", "", "", "" ],
+    "EVPWRCONSTOTAL": [ 38, None, "EV Power Consumed", "","EV verbruik", "", "", "", "", "" ],
+    "EVPWRREGENTOTAL": [ 39, None, "EV Power Regenerated", "","EV opwek", "", "", "", "", "" ],
 }
 
 class BasePlugin:
@@ -141,7 +147,6 @@ class BasePlugin:
         self._lang = "en"
         self._vehicleLoc = {}           # saved location for vehicles
         self._name2vehicleId = {}
-
         self.vm = None
         self.verbose=True                  # if 1 => add extra debugging messages. Default: False
 
@@ -630,7 +635,8 @@ class BasePlugin:
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=22, Used=1).Create()
 
-        k='EVPWRCONSUMED'; dev=DEVS[k]
+        k='EVPWRCONS90DAYS'; dev=DEVS[k]
+        # note the total power provided by hyundai/kia cloud is actually the total for 90 days
         if hasattr(v, 'total_power_consumed'):
             dev[1] =  'total_power_consumed'
         if dev[1]!=None:
@@ -654,14 +660,35 @@ class BasePlugin:
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._ev_target_range_charge_AC_unit}, Used=1).Create()
 
-        k='EVPWRREGENERATED'; dev=DEVS[k]
+
+        k='EVPWRREGEN90DAYS'; dev=DEVS[k]
+        # note the total power provided by hyundai/kia cloud is actually the total for 90 days
         if hasattr(v, 'total_power_regenerated'):
             dev[1] =  'total_power_regenerated'
         if dev[1]!=None:
             var=getattr(v,dev[1], None)
             if var != None and base+dev[0] not in Devices:
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=113, Subtype=0, Switchtype=0, Used=1).Create()
+
+        k='EVPWRCONSTOTAL'; dev=DEVS[k]
+        # the all time total power consumed will be tracked using daily stats values from the cloud onto an incremental counter      
+        if hasattr(v, 'daily_stats'):
+            dev[1] = 'daily_stats'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None)
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=28, Switchtype=0, Used=1).Create()
+
+        k='EVPWRREGENTOTAL'; dev=DEVS[k]
+        # the all time total power regenerated will be tracked using daily stats values from the cloud onto an incremental counter      
+        if hasattr(v, 'daily_stats'):
+            dev[1] = 'daily_stats'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None)
+            if var != None and base+dev[0] not in Devices:
+                Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=28, Switchtype=0, Used=1).Create()
     
+
     def updateDevices(self, base, name, v):
         """ Update devices for car named {name}, starting from base unit {base}, using vehicle parameters in {v} """
         Domoticz.Log(f"Car found at base {base}")
@@ -913,7 +940,7 @@ class BasePlugin:
             sValue="Ok" if nValue == 0 else "Low"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
 
-        k='EVPWRCONSUMED'; dev=DEVS[k]; var=getattr(v, dev[1], None)
+        k='EVPWRCONS90DAYS'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None and var != 0:
             nValue=var
             if self.verbose: Domoticz.Log(f"{k}={var}")
@@ -932,13 +959,51 @@ class BasePlugin:
             if self.verbose: Domoticz.Log(f"{k}={var}")
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
 
-        k='EVPWRREGENERATED'; dev=DEVS[k]; var=getattr(v, dev[1], None)
+        k='EVPWRREGEN90DAYS'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None and var != 0:
             nValue=var
             if self.verbose: Domoticz.Log(f"{k}={var}")
             nValue=int(nValue)
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
-        
+
+        if hasattr(v, 'daily_stats'):
+            var=getattr(v,'daily_stats',None)
+            todayPwrConsumed=0
+            todayPwrRegenerated=0
+            today=date.today()
+            todayString=datetime.strftime(today,'%Y-%m-%d 00:00:00')
+            for day in range(len(var)):
+                # normally the first record is the last day with pwr consumption, but looping through the list anyway to be sure
+                dailystat=var[day]
+                statDay=getattr(dailystat,'date',None)
+                statConsumed=getattr(dailystat,'total_consumed',None)
+                statRegenerated=getattr(dailystat,'regenerated_energy',None)
+                if str(statDay)==todayString:
+#                    Domoticz.Log(f"copying today's values")
+#                    Domoticz.Log(f"today {todayString} date {statDay}")
+#                    Domoticz.Log(f"consumed {statConsumed}")
+#                    Domoticz.Log(f"regenerated {statRegenerated}")
+                    todayPwrConsumed+=statConsumed
+                    todayPwrRegenerated+=statRegenerated
+
+            if todayPwrConsumed>0:
+                k='EVPWRCONSTOTAL'; dev=DEVS[k]
+                TotalPwrConsID=Devices[base+dev[0]].ID
+                result,Counter,CounterToday=getCounter(TotalPwrConsID)
+                if result:
+                    incrementValue=todayPwrConsumed-CounterToday
+#                    Domoticz.Log(f"PwrConsumed Counter {Counter} counterToday {CounterToday} daily stat {todayPwrConsumed} Increment {incrementValue}") 
+                    Devices[base+dev[0]].Update(nValue=0, sValue=str(incrementValue))
+
+            if todayPwrRegenerated>0:
+                k='EVPWRREGENTOTAL'; dev=DEVS[k]
+                TotalPwrRegenID=Devices[base+dev[0]].ID
+                result,Counter,CounterToday=getCounter(TotalPwrRegenID)
+                if result:
+                    incrementValue=todayPwrRegenerated-CounterToday
+#                    Domoticz.Log(f"PwrRegenerated Counter {Counter} counterToday {CounterToday} daily stat {todayPwrRegenerated} Increment {incrementValue}")
+                    Devices[base+dev[0]].Update(nValue=0, sValue=str(incrementValue))                     
+
         if self.verbose: Domoticz.Log(f"updateDevices() completed!")
         # Reset force update button
         Devices[base+DEVS['UPDATE'][0]].Update(nValue=0, sValue="Off")
@@ -953,6 +1018,27 @@ class BasePlugin:
     def onTimeout(self, Connection):    #DEBUG
         Domoticz.Log(f"onTimeout({Connection})")
         
+
+def getCounter(varIDX):
+    # function to get the Counter and Countertoday value of a counter device indicated by the varIDX number
+    try:
+        apiCall="http://"+DomoticzIP+":"+DomoticzPort+"/json.htm?type=command&param=getdevices&rid="+str(varIDX)
+        response = requests.get(apiCall)
+        responseResult=str(response.json()["status"])
+        if responseResult=="ERR":
+            raise Exception
+        else:
+            divider=response.json()["result"][0]["Divider"]
+            counterValue=int(divider*float(str(response.json()["result"][0]["Counter"]).split()[0]))
+            counterTodayValue=int(divider*float(str(response.json()["result"][0]["CounterToday"]).split()[0]))
+            responseResult=True
+    except:
+        Domoticz.Log(f"ERROR: unable to retrieve the value of user variable with IDX {varIDX} {response}")
+        responseResult=False
+        counterValue=None
+        counterTodayValue=None
+    return responseResult,counterValue,counterTodayValue
+
 
 ####################################################################################
 global _plugin
