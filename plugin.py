@@ -11,7 +11,7 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="1.1.5" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="1.1.6" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
         <h2>Domoticz Hyundai Kia connect plugin - 1.1.5</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
@@ -149,6 +149,7 @@ class BasePlugin:
         self._name2vehicleId = {}
         self.vm = None
         self.verbose=True                  # if 1 => add extra debugging messages. Default: False
+        self.firstRun=False
 
     def getVehicleId(self, Unit):
             # get name and id for the vehicle associated to Devices[Unit]
@@ -213,6 +214,7 @@ class BasePlugin:
     def onHeartbeat(self):
         """ Called every 10 seconds or other interval set by Domoticz.Heartbeat() """
         Domoticz.Debug("onHeartbeat()") 
+        self.firstRun=False
         if self._fetchingData == 0:
             #it's not fetching data from cloud
             if (self._setChargeLimits&15) != 0: #_setChargeLimits=0bzyxw0010  where if w is set => changed limits for vehicle with base=0, x=1 => vehicle with base=UNITMASK+1 (64), ....
@@ -677,8 +679,10 @@ class BasePlugin:
         if dev[1]!=None:
             var=getattr(v,dev[1], None)
             if var != None and base+dev[0] not in Devices:
+                self.firstRun=True
                 Domoticz.Log(f"creating device {k}")
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=28, Switchtype=0, Used=1).Create()
+                Devices[base+dev[0]].Update(nValue=0, sValue=str(0))
 
         k='EVPWRREGENTOTAL'; dev=DEVS[k]
         # the all time total power regenerated will be tracked using daily stats values from the cloud onto an incremental counter      
@@ -687,8 +691,10 @@ class BasePlugin:
         if dev[1]!=None:
             var=getattr(v,dev[1], None)
             if var != None and base+dev[0] not in Devices:
+                self.firstRun=True
                 Domoticz.Log(f"creating device {k}")
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=28, Switchtype=0, Used=1).Create()
+                Devices[base+dev[0]].Update(nValue=0, sValue=str(0))
     
 
     def updateDevices(self, base, name, v):
@@ -968,7 +974,7 @@ class BasePlugin:
             nValue=int(nValue)
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
 
-        if hasattr(v, 'daily_stats'):
+        if hasattr(v, 'daily_stats') and self.firstRun==False:
             var=getattr(v,'daily_stats',None)
             todayPwrConsumed=0
             todayPwrRegenerated=0
@@ -1009,6 +1015,10 @@ class BasePlugin:
                     Devices[base+dev[0]].Update(nValue=0, sValue=str(incrementValue))
                 else:
                     Domoticz.Log(f"Counter Check of device {k} failed. Postponing update till next time")
+        else:
+            if self.firstRun==True:
+                Domoticz.Log(f"Not updating new PWR devices on first run with today's values")
+
 
 
         if self.verbose: Domoticz.Log(f"updateDevices() completed!")
