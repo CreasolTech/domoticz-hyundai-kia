@@ -677,6 +677,7 @@ class BasePlugin:
         if dev[1]!=None:
             var=getattr(v,dev[1], None)
             if var != None and base+dev[0] not in Devices:
+                Domoticz.Log(f"creating device {k}")
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=28, Switchtype=0, Used=1).Create()
 
         k='EVPWRREGENTOTAL'; dev=DEVS[k]
@@ -686,6 +687,7 @@ class BasePlugin:
         if dev[1]!=None:
             var=getattr(v,dev[1], None)
             if var != None and base+dev[0] not in Devices:
+                Domoticz.Log(f"creating device {k}")
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=28, Switchtype=0, Used=1).Create()
     
 
@@ -979,10 +981,10 @@ class BasePlugin:
                 statConsumed=getattr(dailystat,'total_consumed',None)
                 statRegenerated=getattr(dailystat,'regenerated_energy',None)
                 if str(statDay)==todayString:
-#                    Domoticz.Log(f"copying today's values")
-#                    Domoticz.Log(f"today {todayString} date {statDay}")
-#                    Domoticz.Log(f"consumed {statConsumed}")
-#                    Domoticz.Log(f"regenerated {statRegenerated}")
+                    Domoticz.Log(f"copying today's values")
+                    Domoticz.Log(f"today {todayString} date {statDay}")
+                    Domoticz.Log(f"consumed {statConsumed}")
+                    Domoticz.Log(f"regenerated {statRegenerated}")
                     todayPwrConsumed+=statConsumed
                     todayPwrRegenerated+=statRegenerated
 
@@ -992,8 +994,10 @@ class BasePlugin:
                 result,Counter,CounterToday=getCounter(TotalPwrConsID)
                 if result:
                     incrementValue=todayPwrConsumed-CounterToday
-#                    Domoticz.Log(f"PwrConsumed Counter {Counter} counterToday {CounterToday} daily stat {todayPwrConsumed} Increment {incrementValue}") 
+                    Domoticz.Log(f"PwrConsumed Counter {Counter} counterToday {CounterToday} daily stat {todayPwrConsumed} Increment {incrementValue}") 
                     Devices[base+dev[0]].Update(nValue=0, sValue=str(incrementValue))
+                else:
+                    Domoticz.Log(f"Counter Check of device {k} failed. Postponing update till next time")
 
             if todayPwrRegenerated>0:
                 k='EVPWRREGENTOTAL'; dev=DEVS[k]
@@ -1001,8 +1005,11 @@ class BasePlugin:
                 result,Counter,CounterToday=getCounter(TotalPwrRegenID)
                 if result:
                     incrementValue=todayPwrRegenerated-CounterToday
-#                    Domoticz.Log(f"PwrRegenerated Counter {Counter} counterToday {CounterToday} daily stat {todayPwrRegenerated} Increment {incrementValue}")
-                    Devices[base+dev[0]].Update(nValue=0, sValue=str(incrementValue))                     
+                    Domoticz.Log(f"PwrRegenerated Counter {Counter} counterToday {CounterToday} daily stat {todayPwrRegenerated} Increment {incrementValue}")
+                    Devices[base+dev[0]].Update(nValue=0, sValue=str(incrementValue))
+                else:
+                    Domoticz.Log(f"Counter Check of device {k} failed. Postponing update till next time")
+
 
         if self.verbose: Domoticz.Log(f"updateDevices() completed!")
         # Reset force update button
@@ -1022,6 +1029,7 @@ class BasePlugin:
 def getCounter(varIDX):
     # function to get the Counter and Countertoday value of a counter device indicated by the varIDX number
     try:
+        responseResult=False
         apiCall="http://"+DomoticzIP+":"+DomoticzPort+"/json.htm?type=command&param=getdevices&rid="+str(varIDX)
         response = requests.get(apiCall)
         responseResult=str(response.json()["status"])
@@ -1033,7 +1041,7 @@ def getCounter(varIDX):
             counterTodayValue=int(divider*float(str(response.json()["result"][0]["CounterToday"]).split()[0]))
             responseResult=True
     except:
-        Domoticz.Log(f"ERROR: unable to retrieve the value of user variable with IDX {varIDX} {response}")
+        Domoticz.Log(f"ERROR: unable to retrieve the value of device with IDX {varIDX} {response}")
         responseResult=False
         counterValue=None
         counterTodayValue=None
@@ -1059,4 +1067,3 @@ def onCommand(Unit, Command, Level, Hue):
 def onTimeout(Connection): #DEBUG
     global _plugin
     _plugin.onTimeout(Connection)
-
