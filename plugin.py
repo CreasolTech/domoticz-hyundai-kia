@@ -208,7 +208,7 @@ class BasePlugin:
         self._lastPoll = None   # force reconnecting in 10 seconds 
         #self._lastPoll = datetime.now() # do not reconnect in 10 seconds, to avoid daily connection exceeding during testing #DEBUG 
         
-        logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.INFO)
+        #logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.INFO)
         #logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.DEBUG) #DEBUG
 
     def onHeartbeat(self):
