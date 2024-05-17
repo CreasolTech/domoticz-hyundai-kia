@@ -1,6 +1,12 @@
 domoticz-hyundai-kia plugin
 ChangeLog
 
+20240517 1.1.6
+In case that location changes, a call to openstreetmap is done to get the
+associated address. In case that call fails, now it will be retried again with
+the next poll (before, call to get the address was done only when location
+changes).
+
 20230331 1.1.5
 The power consumed and power generated devices from 1.1.4. are renamed to clearly show that those only show 90-day data as provided by the Hyundai-Kia cloud.
 Two new devices are added to show the all-time totals of the power consumed and power generated.

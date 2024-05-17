@@ -11,9 +11,9 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="1.1.6" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="1.1.7" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
-        <h2>Domoticz Hyundai Kia connect plugin - 1.1.6</h2>
+        <h2>Domoticz Hyundai Kia connect plugin - 1.1.7</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
         tyres status, door lock status, and much more.<br/>
         <b>Before activating this plugin, assure that you've set the right name to your car</b> (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.<br/>
@@ -147,6 +147,7 @@ class BasePlugin:
         self._lang = "en"
         self._vehicleLoc = {}           # saved location for vehicles
         self._name2vehicleId = {}
+        self._getAddress = 1            # force device to get address associated to the current latitude/longitude
         self.vm = None
         self.verbose=True                  # if 1 => add extra debugging messages. Default: False
         self.firstRun=False
@@ -792,7 +793,7 @@ class BasePlugin:
                 #initialize vehicleLoc
                 self._vehicleLoc[name]={'latitude': lat, 'longitude': lon+0.000001} # initialize variable but force a minimum variation to compute the real position
 
-            if lat!=self._vehicleLoc[name]['latitude'] or lon!=self._vehicleLoc[name]['longitude']:
+            if self._getAddress==1 or lat!=self._vehicleLoc[name]['latitude'] or lon!=self._vehicleLoc[name]['longitude']:
                 # LOCATION changed or not previously set
                 # get address
                 if self.verbose: Domoticz.Log(f"Latitude or Longitude have changed")
@@ -805,6 +806,10 @@ class BasePlugin:
                     Domoticz.Log(f"Location address: {locAddr}")
                     sValue=fill(locAddr, 40) + ' ' + locMap
                     Devices[base+DEVS['LOCATION'][0]].Update(nValue=0, sValue=sValue)
+                    self._getAddress=0 # Address get successfully: update it only in case that location changes.
+                else:
+                    Domoticz.Log(f"Trying to get address, but got response_code {response.status_code}: {response}")
+                    self._getAddress=1 # retry to get address again
 
                 # HOME DISTANCE: compute distance from home
                 homeloc=Settings['Location'].split(';')
