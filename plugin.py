@@ -74,6 +74,8 @@ from textwrap import fill
 from hyundai_kia_connect_api import *
 from hyundai_kia_connect_api.exceptions import *
 
+import os, psutil   #DEBUG !!!
+
 DomoticzIP="127.0.0.1"
 DomoticzPort="8080"
 
@@ -155,21 +157,21 @@ class BasePlugin:
     def getVehicleId(self, Unit):
             # get name and id for the vehicle associated to Devices[Unit]
             vehicleId = False
-            Domoticz.Log(f"Device Name={Devices[Unit].Name}")
+            Domoticz.Status(f"Device Name={Devices[Unit].Name}")
             name=re.findall(f"{Parameters['Name']} - ([a-zA-Z0-9-_]+) .*", Devices[Unit].Name)[0]
             if self._name2vehicleId == {}:
                 # call onHeartbeat to load vehicles data
-                Domoticz.Log("_name2vehicleId is empty => call onHeartBeat to init vehicles data")
+                Domoticz.Status("_name2vehicleId is empty => call onHeartBeat to init vehicles data")
                 self.checkDevices = True
                 self._lastPoll = None
                 self.onHeartbeat()
 
             if name in self._name2vehicleId:
                 vehicleId=self._name2vehicleId[name]
-                Domoticz.Log(f"name={name} vehicleId={vehicleId} Unit={Unit}")
+                Domoticz.Status(f"name={name} vehicleId={vehicleId} Unit={Unit}")
             else:
                 # vehicleId not found
-                Domoticz.Log(f"Vehicle ID not found: there is not a vehicle named {name} in the Hyundai/Kia cloud")
+                Domoticz.Status(f"Vehicle ID not found: there is not a vehicle named {name} in the Hyundai/Kia cloud")
             return vehicleId
  
     def mustPoll(self):
@@ -192,7 +194,7 @@ class BasePlugin:
         return False
 
     def onStart(self):
-        Domoticz.Log("Parameters="+str(Parameters))
+        Domoticz.Status("Parameters="+str(Parameters))
         Domoticz.Debug("Settings="+str(Settings))
         Domoticz.Heartbeat(30)
         self._lang=Settings["Language"]
@@ -200,7 +202,7 @@ class BasePlugin:
         if self._lang in LANGS:
             self._devlang=LANGBASE+LANGS.index(self._lang)
         else:
-            Domoticz.Log(f"Language {self._lang} does not exist in dict DEVS, inside the domoticz_hyundai_kia plugin, but you can contribute adding it ;-) Thanks!")
+            Domoticz.Error(f"Language {self._lang} does not exist in dict DEVS, inside the domoticz_hyundai_kia plugin, but you can contribute adding it ;-) Thanks!")
             self._lang="en"
             self._devlang=LANGBASE # default: english text
         self._pollInterval = int(Parameters["Mode1"])
@@ -215,6 +217,7 @@ class BasePlugin:
     def onHeartbeat(self):
         """ Called every 10 seconds or other interval set by Domoticz.Heartbeat() """
         Domoticz.Debug("onHeartbeat()") 
+        Domoticz.Log(f"Memory used by Domoticz: RSS={psutil.Process(os.getpid()).memory_info().rss / 1024}kB") #DEBUG
         self.firstRun=False
         if self._fetchingData == 0:
             #it's not fetching data from cloud
@@ -230,30 +233,30 @@ class BasePlugin:
                             if vehicleId!=False:
                                 ac=int(Devices[Unit].sValue)
                                 dc=int(Devices[Unit+1].sValue)
-                                Domoticz.Log(f"Set charge limits for device Unit={Unit}, AC={ac}, DC={dc}")
+                                Domoticz.Status(f"Set charge limits for device Unit={Unit}, AC={ac}, DC={dc}")
                                 ret=self.vm.set_charge_limits(vehicleId, ac, dc)
                         bases>>=1
                         base+=UNITMASK+1   # is next base 
             elif self.mustPoll():   # check if vehicles data should be polled. return False if polling is already in progress 
                 self._lastPoll = datetime.now()
-                Domoticz.Log("*** check_and_refresh_token()...")
+                Domoticz.Status("*** check_and_refresh_token()...")
                 #ret=self.vm.check_and_refresh_token()
                 try:
                     self.vm.check_and_refresh_token()
                 except AuthenticationError as AuthError:
-                    Domoticz.Log(f"AuthError: {AuthError}")
+                    Domoticz.Status(f"AuthError: {AuthError}")
                 except:
-                    Domoticz.Log(f"Unknown error")
+                    Domoticz.Status(f"Unknown error")
 
-                Domoticz.Log(f"*** check_and_force_update_vehicles({self.interval*30})...")
-                #Domoticz.Log(f"*** force_refresh_all_vehicles_states()...")
+                Domoticz.Status(f"*** check_and_force_update_vehicles({self.interval*30})...")
+                #Domoticz.Status(f"*** force_refresh_all_vehicles_states()...")
                 try:
                     #self.vm.check_and_force_update_vehicles(self.interval*30)  # get state from cloud if fresh (less than interval minutes), or automatically request a car upate
                     # whether it is time to get data is determine by the "mustPoll()" check above, no need to test again in the API
                     self.vm.force_refresh_all_vehicles_states()  # Get data from the cloud, new and existing. Note not all data is continuously updated in the cloud. 
                     self.vm.update_all_vehicles_with_cached_state() # Both these statements are needed to get data for all variables.
                 except Exception:
-                    Domoticz.Log(f"Exception")
+                    Domoticz.Status(f"Exception")
 
                 self._isCharging=False  # set to false: if one vehicle is charging, this flag will be set by updateDevices()
                 self._engineOn=False    # set to false: if one vehicle is moving,   this flag will be set by updateDevices()
@@ -269,12 +272,12 @@ class BasePlugin:
                     else: 
                         batterySOC=0
                         
-                    Domoticz.Log(f"Name={name} Odometer={v._odometer_value}{v._odometer_unit} Battery={batterySOC}")
-                    Domoticz.Log(f"Vehicle=")
+                    Domoticz.Status(f"Name={name} Odometer={v._odometer_value}{v._odometer_unit} Battery={batterySOC}")
+                    Domoticz.Status(f"Vehicle=")
                     # split v structure in more lines (too big to be printed in one line)
                     var=str(v)
                     for i in range(0,len(var),4096):
-                        Domoticz.Log(var[i:i+4096])
+                        Domoticz.Status(var[i:i+4096])
                 
                     # base = Unit base = 0, 64, 128, 192 # up to 4 vehicles can be addressed, 64 devices per vehicle (Unit <= 255)
                     # Find the right Unit for the current car
@@ -287,7 +290,7 @@ class BasePlugin:
                         else:
                             if baseFree > base:
                                 baseFree = base # free base where devices can be stored
-                    Domoticz.Log(f"base={base} baseFree={baseFree}")
+                    Domoticz.Status(f"base={base} baseFree={baseFree}")
 
                     if base >= 256 and baseFree < 256:
                         # car not found, but there is enough space for a new car
@@ -303,30 +306,30 @@ class BasePlugin:
         else:
             #self._fetchingData>1 => system is fetching data from cloud
             self._fetchingData += 1 # still fetching data from cloud API
-            Domoticz.Log(f"onHeartbeat: fetching data has been started since {self._fetchingData}0 seconds")
+            Domoticz.Status(f"onHeartbeat: fetching data has been started since {self._fetchingData}0 seconds")
             if self._fetchingData > 10:
                 # fetching started more than 100s ago!
-                Domoticz.Log(f"onHeartbeat: fetching data has been started more than {self._fetchingData}0 seconds ago")
+                Domoticz.Status(f"onHeartbeat: fetching data has been started more than {self._fetchingData}0 seconds ago")
 
 
     def onCommand(self, Unit, Command, Level, Hue):
-        Domoticz.Log(f"onCommand(Unit={Unit}, Command={Command}, Level={Level}, Hue={Hue})")
+        Domoticz.Status(f"onCommand(Unit={Unit}, Command={Command}, Level={Level}, Hue={Hue})")
         if (Unit&UNITMASK) == DEVS["UPDATE"][0]:  #force status update
             Devices[Unit].Update(nValue=1 if Command=="On" else 0, sValue=Command)
             if Command=="On":
                 if self._fetchingData == 0:
-                    Domoticz.Log("Force update command")
+                    Domoticz.Status("Force update command")
                     self._checkDevices = True
                     self._lastPoll = None
                     self.interval=1
                     self.onHeartbeat()
             else:
                 #Update button has been switched OFF
-                Domoticz.Log(f"UPDATE button has been switched OFF")
+                Domoticz.Status(f"UPDATE button has been switched OFF")
         else:
             vehicleId=self.getVehicleId(Unit) # get name and id for the vehicle
             if vehicleId==False:
-                Domoticz.Log("vehicleId not found => ignore command")
+                Domoticz.Status("vehicleId not found => ignore command")
                 return  # vehicleId not found
 
             if (Unit&UNITMASK) == DEVS["CLIMAON"][0]:   # start/stop climate control
@@ -340,11 +343,11 @@ class BasePlugin:
                     options.climate=True if options.set_temp<23 else False
                     options.heating=True if options.set_temp>=23 else False
                     ret=self.vm.start_climate(vehicleId, options)
-                    Domoticz.Log(f"start_climate() with options={options}. Returned {ret}")
+                    Domoticz.Status(f"start_climate() with options={options}. Returned {ret}")
                     Devices[Unit].Update(nValue=1, sValue="On")
                 else:   # Off command
                     ret=self.vm.stop_climate(vehicleId)
-                    Domoticz.Log(f"stop_climate() returned {ret}")
+                    Domoticz.Status(f"stop_climate() returned {ret}")
                     Devices[Unit].Update(nValue=0, sValue="Off")
             elif (Unit&UNITMASK) == DEVS["CLIMATEMP"][0]:   # air temperature
                 airTemp=float(Level)
@@ -355,11 +358,11 @@ class BasePlugin:
                 Devices[Unit].Update(nValue=0, sValue=str(airTemp))
             elif (Unit&UNITMASK) == DEVS["OPEN"][0]:   # open/close
                 if Command == "On": # => lock
-                    Domoticz.Log(f"lock command")
+                    Domoticz.Status(f"lock command")
                     ret=self.vm.lock(vehicleId)
                     Devices[Unit].Update(nValue=1, sValue="On")
                 else:   # Off command => unlock
-                    Domoticz.Log(f"unlock command")
+                    Domoticz.Error(f"unlock command")
                     ret=self.vm.unlock(vehicleId)
                     Devices[Unit].Update(nValue=0, sValue="Off")
             elif (Unit&UNITMASK) == DEVS["EVLIMITAC"][0] or (Unit&UNITMASK) == DEVS["EVLIMITDC"][0]:
@@ -367,21 +370,21 @@ class BasePlugin:
                 self._setChargeLimits=1  # set charge limits after 2*HeartBeat 
                 self._setChargeLimits|=16<<(Unit>>6)    #store in setChargeLimits which devices have been changed 0bzyxw0010 where w=1 if base=0, x=1 if base=64, y=1 if base=128, ...
                 Level=Level-Level%10    # Level should be 0, 10, 20, 30, ...
-                Domoticz.Log(f"New value={Level}")
+                Domoticz.Status(f"New value={Level}")
                 Devices[Unit].Update(nValue=1, sValue=str(Level))
             elif (Unit&UNITMASK) == DEVS["EVCHARGEON"][0]:    # Start or stop charging
                 if Command == "On":
-                    Domoticz.Log(f"Received command to start charging")
+                    Domoticz.Status(f"Received command to start charging")
                     Devices[Unit].Update(nValue=1, sValue="On")
                     ret=self.vm.start_charge(vehicleId)
                 else:
-                    Domoticz.Log(f"Received command to stop charging")
+                    Domoticz.Status(f"Received command to stop charging")
                     Devices[Unit].Update(nValue=0, sValue="Off")
                     ret=self.vm.stop_charge(vehicleId)
 
     def addDevices(self, base, name, v):
         """ Add devices for car named {name}, starting from base unit {base}, using vehicle parameters in {v} """
-        Domoticz.Log(f"Add devices for car {name} with base index {base}")
+        Domoticz.Status(f"Add devices for car {name} with base index {base}")
 
         k='EVSTATE'; dev=DEVS[k]
         if hasattr(v,'ev_battery_is_charging'):
@@ -681,7 +684,7 @@ class BasePlugin:
             var=getattr(v,dev[1], None)
             if var != None and base+dev[0] not in Devices:
                 self.firstRun=True
-                Domoticz.Log(f"creating device {k}")
+                Domoticz.Status(f"creating device {k}")
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=28, Switchtype=0, Used=1).Create()
                 Devices[base+dev[0]].Update(nValue=0, sValue=str(0))
 
@@ -693,14 +696,14 @@ class BasePlugin:
             var=getattr(v,dev[1], None)
             if var != None and base+dev[0] not in Devices:
                 self.firstRun=True
-                Domoticz.Log(f"creating device {k}")
+                Domoticz.Status(f"creating device {k}")
                 Domoticz.Device(Unit=base+dev[0], Name=f"{name} {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=28, Switchtype=0, Used=1).Create()
                 Devices[base+dev[0]].Update(nValue=0, sValue=str(0))
     
 
     def updateDevices(self, base, name, v):
         """ Update devices for car named {name}, starting from base unit {base}, using vehicle parameters in {v} """
-        Domoticz.Log(f"Car found at base {base}")
+        Domoticz.Status(f"Car found at base {base}")
 
         k='EVSTATE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         var2=getattr(v, 'ev_battery_is_plugged_in', 0)
@@ -725,43 +728,43 @@ class BasePlugin:
         if var != None:
             nValue=var
             batteryLevel=var
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
         
         k='EVRANGE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=int(var)
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
             
         k='EVLIMITAC'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=var
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             Devices[base+dev[0]].Update(nValue=1, sValue=str(nValue))
             
         k='EVLIMITDC'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=var
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             Devices[base+dev[0]].Update(nValue=1, sValue=str(nValue))
             
         k='FUELLEVEL'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=var
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
             
         k='FUELRANGE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=int(var)
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
             
         k='ENGINEON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             value=var
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=0; sValue="Off"
             if (value):
                 nValue=1; sValue="On"
@@ -771,7 +774,7 @@ class BasePlugin:
         k='ODOMETER'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None and var != 0:
             nValue=var
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=int(nValue)
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
 
@@ -796,21 +799,21 @@ class BasePlugin:
             if self._getAddress==1 or lat!=self._vehicleLoc[name]['latitude'] or lon!=self._vehicleLoc[name]['longitude']:
                 # LOCATION changed or not previously set
                 # get address
-                if self.verbose: Domoticz.Log(f"Latitude or Longitude have changed")
+                if self.verbose: Domoticz.Status(f"Latitude or Longitude have changed")
                 get_address_url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&lat=' + str(lat) + '&lon=' + str(lon)
                 response = requests.get(get_address_url)
                 if response.status_code == 200:
                     response = json.loads(response.text)
                     locAddr=response['display_name']
-                    locMap = '<a href="http://www.google.com/maps/search/?api=1&query=' + str(lat) + ',' + str(lon) + '" target="_new"><em style="color:blue;">Map</em></a>'
-                    Domoticz.Log(f"Location address: {locAddr}")
-                    sValue=fill(locAddr, 40) + ' ' + locMap
-                    Devices[base+DEVS['LOCATION'][0]].Update(nValue=0, sValue=sValue)
-                    self._getAddress=0 # Address get successfully: update it only in case that location changes.
+                    Domoticz.Status(f"Location address: {locAddr}")
                 else:
-                    Domoticz.Log(f"Trying to get address, but got response_code {response.status_code}: {response}")
+                    Domoticz.Error(f"Trying to get address, but got response_code {response.status_code}")
                     self._getAddress=1 # retry to get address again
-
+                    locAddr='Unknown'
+                locMap = f"<a href=\"http://www.google.com/maps/search/?api=1&query={lat},{lon}\" target=\"_new\"><em style=\"color:blue;\">Map</em></a>"
+                sValue=fill(locAddr, 40) + ' ' + locMap
+                Devices[base+DEVS['LOCATION'][0]].Update(nValue=0, sValue=sValue)
+                self._getAddress=0 # Address get successfully: update it only in case that location changes.
                 # HOME DISTANCE: compute distance from home
                 homeloc=Settings['Location'].split(';')
                 distance=round(self.distance(lat, lon, float(homeloc[0]), float(homeloc[1])), 1)
@@ -822,18 +825,18 @@ class BasePlugin:
                         nValue=value['vehicleLocation']['speed']['value']
                         sValue=str(nValue)
                         Devices[base+DEVS['SPEED'][0]].Update(nValue=nValue, sValue=sValue)
-                        Domoticz.Log(f"Vehicle {name} has odometer={v.odometer} speed={nValue} distance_from_home={distance} EV battery={batteryLevel}%")
+                        Domoticz.Status(f"Vehicle {name} has odometer={v.odometer} speed={nValue} distance_from_home={distance} EV battery={batteryLevel}%")
 
                 self._vehicleLoc[name]['latitude']=lat
                 self._vehicleLoc[name]['longitude']=lon
             else:
-                if self.verbose: Domoticz.Log(f"Latitude or Longitude NOT changed: lat={lat}, lon={lon}")
+                if self.verbose: Domoticz.Status(f"Latitude or Longitude NOT changed: lat={lat}, lon={lon}")
         else: 
-            if self.verbose: Domoticz.Log(f"Latitude or Longitude NOT found")
+            if self.verbose: Domoticz.Status(f"Latitude or Longitude NOT found")
 
         k='CLIMAON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             value=var
             nValue=1 if value else 0
             sValue="On" if value else "Off"
@@ -842,113 +845,113 @@ class BasePlugin:
         k='CLIMATEMP'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=float(var)
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             Devices[base+dev[0]].Update(nValue=0, sValue=str(nValue))
             
         k='DEFROSTON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=1 if var else 0
             sValue="On" if var else "Off"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='REARWINDOWON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue="On" if var>0 else "Off"
             Devices[base+DEVS['REARWINDOWON'][0]].Update(nValue=nValue, sValue=sValue)
             
         k='STEERINGWHEELON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue="On" if var>0 else "Off"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
 
         k='SIDEMIRRORSON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=1 if var else 0
             sValue="On" if var else "Off"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='SEATFL'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             sValue=var
             Devices[base+dev[0]].Update(nValue=0, sValue=sValue)
             
         k='SEATFR'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             sValue=var
             Devices[base+dev[0]].Update(nValue=0, sValue=sValue)
             
         k='SEATRL'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             sValue=var
             Devices[base+dev[0]].Update(nValue=0, sValue=sValue)
            
         k='SEATRR'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             sValue=var
             Devices[base+dev[0]].Update(nValue=0, sValue=sValue)
             
         k='OPEN'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=1 if var else 0
             sValue="Unlocked" if var else "Locked"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='TRUNK'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=1 if var else 0
             sValue="Open" if var else "Closed"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='HOOD'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=1 if var else 0
             sValue="Open" if var else "Closed"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='12VBATT'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue=str(nValue)
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='KEYBATT'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue="Ok" if nValue == 0 else "Low"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='WASHER'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue="Ok" if nValue == 0 else "Empty"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='BRAKE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue="Ok" if nValue == 0 else "Empty"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
             
         k='TIRES'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue="Ok" if nValue == 0 else "Low"
             Devices[base+dev[0]].Update(nValue=nValue, sValue=sValue)
@@ -956,26 +959,26 @@ class BasePlugin:
         k='EVPWRCONS90DAYS'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None and var != 0:
             nValue=var
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=int(nValue)
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
 
         k='EVESTCHGDURATION'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=int(var)
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
 
         k='EVTARGETCHGRANGE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=int(var)
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
 
         k='EVPWRREGEN90DAYS'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None and var != 0:
             nValue=var
-            if self.verbose: Domoticz.Log(f"{k}={var}")
+            if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=int(nValue)
             Devices[base+dev[0]].Update(nValue=nValue, sValue=str(nValue))
 
@@ -992,10 +995,10 @@ class BasePlugin:
                 statConsumed=getattr(dailystat,'total_consumed',None)
                 statRegenerated=getattr(dailystat,'regenerated_energy',None)
                 if str(statDay)==todayString:
-                    Domoticz.Log(f"copying today's values")
-                    Domoticz.Log(f"today {todayString} date {statDay}")
-                    Domoticz.Log(f"consumed {statConsumed}")
-                    Domoticz.Log(f"regenerated {statRegenerated}")
+                    Domoticz.Status(f"copying today's values")
+                    Domoticz.Status(f"today {todayString} date {statDay}")
+                    Domoticz.Status(f"consumed {statConsumed}")
+                    Domoticz.Status(f"regenerated {statRegenerated}")
                     todayPwrConsumed+=statConsumed
                     todayPwrRegenerated+=statRegenerated
 
@@ -1005,10 +1008,10 @@ class BasePlugin:
                 result,Counter,CounterToday=getCounter(TotalPwrConsID)
                 if result:
                     incrementValue=todayPwrConsumed-CounterToday
-                    Domoticz.Log(f"PwrConsumed Counter {Counter} counterToday {CounterToday} daily stat {todayPwrConsumed} Increment {incrementValue}") 
+                    Domoticz.Status(f"PwrConsumed Counter {Counter} counterToday {CounterToday} daily stat {todayPwrConsumed} Increment {incrementValue}") 
                     Devices[base+dev[0]].Update(nValue=0, sValue=str(incrementValue))
                 else:
-                    Domoticz.Log(f"Counter Check of device {k} failed. Postponing update till next time")
+                    Domoticz.Error(f"Counter Check of device {k} failed. Postponing update till next time")
 
             if todayPwrRegenerated>0:
                 k='EVPWRREGENTOTAL'; dev=DEVS[k]
@@ -1016,17 +1019,17 @@ class BasePlugin:
                 result,Counter,CounterToday=getCounter(TotalPwrRegenID)
                 if result:
                     incrementValue=todayPwrRegenerated-CounterToday
-                    Domoticz.Log(f"PwrRegenerated Counter {Counter} counterToday {CounterToday} daily stat {todayPwrRegenerated} Increment {incrementValue}")
+                    Domoticz.Status(f"PwrRegenerated Counter {Counter} counterToday {CounterToday} daily stat {todayPwrRegenerated} Increment {incrementValue}")
                     Devices[base+dev[0]].Update(nValue=0, sValue=str(incrementValue))
                 else:
-                    Domoticz.Log(f"Counter Check of device {k} failed. Postponing update till next time")
+                    Domoticz.Error(f"Counter Check of device {k} failed. Postponing update till next time")
         else:
             if self.firstRun==True:
-                Domoticz.Log(f"Not updating new PWR devices on first run with today's values")
+                Domoticz.Status(f"Not updating new PWR devices on first run with today's values")
 
 
 
-        if self.verbose: Domoticz.Log(f"updateDevices() completed!")
+        if self.verbose: Domoticz.Status(f"updateDevices() completed!")
         # Reset force update button
         Devices[base+DEVS['UPDATE'][0]].Update(nValue=0, sValue="Off")
         
@@ -1038,7 +1041,7 @@ class BasePlugin:
         return 12742 * asin(sqrt(a))
 
     def onTimeout(self, Connection):    #DEBUG
-        Domoticz.Log(f"onTimeout({Connection})")
+        Domoticz.Status(f"onTimeout({Connection})")
         
 
 def getCounter(varIDX):
@@ -1056,7 +1059,7 @@ def getCounter(varIDX):
             counterTodayValue=int(divider*float(str(response.json()["result"][0]["CounterToday"]).split()[0]))
             responseResult=True
     except:
-        Domoticz.Log(f"ERROR: unable to retrieve the value of device with IDX {varIDX} {response}")
+        Domoticz.Error(f"ERROR: unable to retrieve the value of device with IDX {varIDX} {response}")
         responseResult=False
         counterValue=None
         counterTodayValue=None
