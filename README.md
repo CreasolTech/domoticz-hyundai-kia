@@ -125,6 +125,9 @@ After this the plugin can be updated with:
 
 
 ## Credits
+Many thanks to:
+* lokonli for the update instructions
+
 Many thanks for the following language translations:
 * Dutch translation by Branko
 * Swedish translation by Joakim W.
