@@ -1,6 +1,13 @@
 domoticz-hyundai-kia plugin
 ChangeLog
 
+2024-07-03 2.0
+Plugin has been rewritten to use the new python framework DomoticzEx.
+For those who are upgrading from a previous version, original devices are
+kept, but they must be renamed according to the new naming convention:
+Before:  PLUGIN_NAME - VEHICLE_NAME DEVICE_NAME   (e.g. Kia - eNiro odometer)
+Now:     VEHICLE_NAME: DEVICE_NAME   (e.g. eNiro: odometer)
+
 20240517 1.1.6
 In case that location changes, a call to openstreetmap is done to get the
 associated address. In case that call fails, now it will be retried again with

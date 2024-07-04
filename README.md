@@ -94,9 +94,9 @@ Also, the vehicle consumes energy for every access, so **do not poll the car too
 
 ## Updating
 
-Sometimes a new version of this plugin also requires an update of the hyundai_kia_connect_api.
+Sometimes a new version of this plugin also requires an update of the *hyundai_kia_connect_api* module.
 
-Assuming you followed the installation instructions as described above, the hyundai_kia_connect_api can be updated to the latest version with the following commands:
+Assuming you followed the installation instructions as described above, the *hyundai_kia_connect_api* can be updated to the latest version with the following commands:
 
 ```
  cd /usr/local/src/hyundai_kia_connect_api/hyundai_kia_connect_api
@@ -123,6 +123,14 @@ After this the plugin can be updated with:
   sudo service domoticz restart
 ```
 
+### Note about upgrade from Rev.1 to Rev2.0 or later
+Version 2.0 (2024-07-03) has been rewritten to use the DomoticzEx framework: DeviceID for each device is kept as the Rev.1, but the name of each device must be renamed manually:
+
+Rev.1 naming: PLUGIN_NAME - CAR_NAME DEVICE_NAME     (for example **Kia - eNiro odometer**)
+
+Rev.2 naming: CAR_NAME: DEVICE_NAME                  (for example **eNiro: odometer**)
+
+**After the plugin has been updated, please remember to manually rename all devices following the new naming convention!**
 
 ## Credits
 Many thanks to:
