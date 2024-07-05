@@ -1,6 +1,8 @@
 domoticz-hyundai-kia plugin
 ChangeLog
 
+TODO: near midnight, compute kWh/100km consumption
+
 2024-07-03 2.0
 Plugin has been rewritten to use the new python framework DomoticzEx.
 For those who are upgrading from a previous version, original devices are

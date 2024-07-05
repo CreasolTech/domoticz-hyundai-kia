@@ -78,7 +78,7 @@ DomoticzIP="127.0.0.1"
 DomoticzPort="8080"
 
 LANGS=[ "en", "it", "nl", "se", "hu", "pl", "fr" ] # list of supported languages, in DEVS dict below
-LANGBASE=5  # item in the DEVS list where the first language starts 
+LANGBASE=2  # item in the DEVS list where the first language starts 
 
 UNITMASK=63 # Unit for each car starts from 1, 65, 129, 193 (max 4 vehicles)
 
@@ -89,50 +89,47 @@ UNITMASK=63 # Unit for each car starts from 1, 65, 129, 193 (max 4 vehicles)
 #French translation by Neutrino
 #German translation by Gerhard M.
 #If you want to add another language, please add, for each line:     , "your translation"
-DEVS={ #topic:      [ unit, Type, Subtype, Switchtype, "en name", "it name", "nl name", "se name", "hu name", "pl name", "fr name", "de_name"  ...other languages should follow  ],
-    "EVSTATE":      [ 1, 243, 19, 0, {}, "EV state", "EV stato", "EV status", "EV status", "EV státusz", "EV staus", "Status VE", "EV Status" ],
-    "EVBATTLEVEL":  [ 2, 243, 6, 0, {}, "EV battery level", "EV livello batteria", "batterijniveau", "EV batterinivå", "EV akku töltöttség", "EV poziom baterii", "Niveau de batterie", "EV Batterieladestand"],
-    "EVRANGE":      [ 3, 243, 31, 0, {'Custom': '1;km'}, "EV range", "EV autonomia", "EV bereik" , "EV räckvidd", "EV hatótáv", "EV zasięg", "Autonomie VE", "EV Reichweite" ],
-    "FUELLEVEL":    [ 4, 243, 6, 0, {}, "fuel level", "livello carburante", "brandstofniveau", "bränslenivå" , "üzemanyagszint", "poziom paliwa" ,"Niveau de carburant", "EV Ladestand"],
-    "FUELRANGE":    [ 5, 243, 31, 0, {'Custom': '1;km'}, "fuel range", "autonomia carburante", "brandstof bereik", "bränsleräckvidd" , "üzemanyag hatótáv", "zasięg paliwa", "Autonomie Carburant", "Reichweite" ],
-    "ENGINEON":     [ 6, 244, 73, 0, {}, "engine ON", "motore acceso", "motor aan", "motor på", "motor be", "silnik włączony" ,"Moteur démarré", "Motor ein"],
-    "ODOMETER":     [ 7, 113, 0, 3, {}, "odometer", "contachilometri", "kilometerteller", "odometer" , "kilométer-számláló", "licznik kilometrów" , "Compteur", "Kilometerstand" ],
-    "LOCATION":     [ 8, 243, 19, 0, {}, "location", "posizione", "locatie", "plats", "hely", "pozycja", "Position", "Position" ],
-    "HOMEDIST":     [ 9, 243, 31, 0, {}, "distance", "distanza", "afstand", "avstånd", "távolság", "dystans" ,"distance", "Distanz"],
-    "SPEED":        [ 10, 243, 31, 0, {}, "speed", "velocità", "snelheid", "hastighet", "sebesség", "prędkość" , "vitesse", "Geschwindigkeit"],
-    "UPDATE":       [ 11, 244, 73, 0, {}, "update req.", "aggiorna", "bijwerken", "uppdatering", "frissítés", "aktualizacja" , "Mise à jour", "Update notwendig" ],
-    "TEMPSET":      [ 12, 0, 0, 0, {}, "NOT USEDtemp. settings", "imp. temperatura", "temperatuur inst.", "temperatur", "hőmérséklet beállítás", "ustawienie temperatury", "Réglage temp.", "Temperatureinstellungen"],
-    "CLIMAON":      [ 13, 244, 73, 0, {}, "climate control", "clima acceso", "airco", "klimat", "klíma", "klimatyzacja","Climatisation", "Klima" ],
-    "DEFROSTON":    [ 14, 244, 73, 0, {}, "defrost", "scongelamento", "ontdooien", "defrost", "páramentesítő", "rozmrożenie" ,"Dégivrage", "Defrostung"],
-    "REARWINDOWON": [ 15, 244, 73, 0, {}, "rear window heater", "lunotto termico", "achterruitverwarming", "bakrutevärme", "hátsó ablak", "tylne okno" ,"Dégivrage arrière", "Fenster hinten"],
-    "STEERINGWHEELON": [ 16, 244, 73, 0, {}, "steering wheel heater", "volante termico", "stuurverwarming", "rattvärme", "kormány", "kierownica" ,"Volant Chauffant", "Lenkrad"],
-    "SIDEMIRRORSON":[ 17, 244, 73, 0, {}, "side mirrors heater", "specchietti termici", "zijspiegel verwarming", "sidospeglar", "oldalsó tükrök", "lusterka boczne" , "Dégivrage rétroviseur", "Seitenspiegel" ],
-    "SEATFL":       [ 18, 243, 19, 0, {}, "seat front-left", "sedile guidatore", "bestuurdersstoel", "förarstol", "bal első ülés", "siedzenie przednie lewe" ,"Siège conducteur", "Sitz vorne links"],
-    "SEATFR":       [ 19, 243, 19, 0, {}, "seat front-right", "sedile passeggero", "bijrijdersstoel", "passagerarstol", "jobb első ülés", "siedzenie przednie prawe" ,"Siège passager", "Sitz vorne rechts"],
-    "SEATRL":       [ 20, 243, 19, 0, {}, "seat rear-left", "sedile post.sx", "achterbank links", "baksäte vänster", "bal hátsó ülés", "siedzenie tylne lewe", "Siège arrière conducteur", "Sitz hinten links" ],
-    "SEATRR":       [ 21, 243, 19, 0, {}, "seat rear-right", "sedile post.dx", "achterbank rechts", "baksäte höger", "jobb hátsó ülés", "siedzenie tylne prawe", "Siège arrière passager", "Sitz hinten rechts" ],
-    "OPEN":         [ 22, 244, 73, 0, {}, "open", "aperta", "open", "öppen", "nyitva", "otwarte", "ouvrir", "offen" ],
-    "TRUNK":        [ 23, 244, 73, 0, {}, "trunk open", "bagagliaio aperto", "kofferbak", "bagagelucka", "casomagtér nyitva", "bagażnik otwarty" , "coffre ouvert", "Kofferraum offen"],
-    "HOOD":         [ 24, 244, 73, 0, {}, "hood open", "cofano aperto", "motorkap", "motorhuv", "motorháztető nyitva", "pokrywa silnika otwarta" , "capot ouvert", "Motorhaube offen" ],
-    "12VBATT":      [ 25, 243, 6, 0, {}, "12V battery", "batteria 12V", "12V batterij", "batteri 12V", "12V akku", "akumulator 12V" , "Batterie 12V", "12V Batterie"],
-    "KEYBATT":      [ 26, 243, 22, 0, {}, "key battery", "batteria radiocomando", "batterij afstandsbediening", "nyckelbatteri", "kulcs elem", "bateria kluczyka", "Pile clé", "Schlüsselbatterie" ],
-    "WASHER":       [ 27, 243, 22, 0, {}, "washer fluid", "liquido tergicristallo", "ruitensproeiervloeistof", "spolarvätska", "ablakmosó", "płyn spryskiwaczy", "lave-glace", "Schweibenwischwasser" ],
-    "BRAKE":        [ 28, 243, 22, 0, {}, "brake fluid", "olio freni", "rem", "bromsvätska", "fékfolyadék", "płyn hamulcowy", "liquide de frein", "Bremsflüssigkeit" ],
-    "TIRES":        [ 29, 243, 22, 0, {}, "tyre pressure", "pressione gomme", "bandenspanning", "däcktryck", "guminyomás", "ciśnienie w oponie", "pression pneus", "Reifenluftdruck" ],
-    "CLIMATEMP":    [ 30, 242, 1, 0, {'ValueStep':'0.5', 'ValueMin':'15', 'ValueMax':'27', 'ValueUnit':'°C'}, "climate temperature", "temperatura clima", "airco temperatuur", "klimattemperatur", "klíma hőfok", "temperatura klimatyzacji", "Température clim", "Klimatemperatur" ],
-    "EVLIMITAC": [ 31, 244, 62, 7, {}, "Charge limit AC", "Limite ricarica AC", "", "", "", "", "", "" ],
-    "EVLIMITDC": [ 32, 244, 62, 7, {}, "Charge limit DC", "Limite ricarica DC", "", "", "", "", "", "" ],
-    "EVCHARGEON": [ 33, 244, 73, 0, {}, "EV Charging", "In ricarica", "", "", "", "", "", "" ],
-    "EVENERGYCONS90DAYS": [ 34, 113, 0, 0, {}, "EV energy in 90d", "energia consumata in 90gg","EV verbruik 90d", "", "", "", "", "" ],
-    "EVESTCHGDURATION": [ 35, 243, 31, 0, {'Custom': '1;min'}, "estimated charge duration", "tempo ricarica stimata", "oplaadduur", "", "", "", "", "" ],
-    "EVTARGETCHGRANGE": [ 36, 243, 31, 0, {'Custom': '1;km'}, "Target Charge Range", "autonomia finale", "doelactieradius", "", "", "", "", "" ],
-    "EVENERGYREGEN90DAYS": [ 37, 113, 0, 4, {}, "EV energy Regen.90d", "energia rigenerata 90gg","EV opwek 90d", "", "", "", "", "" ],
-    "EVENERGYCONSTOTAL": [ 38, 243, 28, 0, {}, "EV energy Consumed", "energia consumata","EV verbruik", "", "", "", "", "" ],
-    "EVENERGYREGENTOTAL": [ 39, 243, 28, 4, {}, "EV energy Regenerated", "energia rigenerata","EV opwek", "", "", "", "", "" ],
+DEVS={ #topic:      [ num, "devname", "en name", "it name", "nl name", "se name", "hu name", "pl name", "fr name", "de_name"  ...other languages should follow  ],
+    "EVSTATE":      [ 1, None, "EV state", "EV stato", "EV status", "EV status", "EV státusz", "EV staus", "Status VE", "EV Status" ],
+    "EVBATTLEVEL":  [ 2, None, "EV battery level", "EV livello batteria", "batterijniveau", "EV batterinivå", "EV akku töltöttség", "EV poziom baterii", "Niveau de batterie", "EV Batterieladestand"],
+    "EVRANGE":      [ 3, None, "EV range", "EV autonomia", "EV bereik" , "EV räckvidd", "EV hatótáv", "EV zasięg", "Autonomie VE", "EV Reichweite" ],
+    "FUELLEVEL":    [ 4, None, "fuel level", "livello carburante", "brandstofniveau", "bränslenivå" , "üzemanyagszint", "poziom paliwa" ,"Niveau de carburant", "EV Ladestand"],
+    "FUELRANGE":    [ 5, None, "fuel range", "autonomia carburante", "brandstof bereik", "bränsleräckvidd" , "üzemanyag hatótáv", "zasięg paliwa", "Autonomie Carburant", "Reichweite" ],
+    "ENGINEON":     [ 6, None, "engine ON", "motore acceso", "motor aan", "motor på", "motor be", "silnik włączony" ,"Moteur démarré", "Motor ein"],
+    "ODOMETER":     [ 7, None, "odometer", "contachilometri", "kilometerteller", "odometer" , "kilométer-számláló", "licznik kilometrów" , "Compteur", "Kilometerstand" ],
+    "LOCATION":     [ 8, None, "location", "posizione", "locatie", "plats", "hely", "pozycja", "Position", "Position" ],
+    "HOMEDIST":     [ 9, None, "distance", "distanza", "afstand", "avstånd", "távolság", "dystans" ,"distance", "Distanz"],
+    "SPEED":        [ 10, None, "speed", "velocità", "snelheid", "hastighet", "sebesség", "prędkość" , "vitesse", "Geschwindigkeit"],
+    "UPDATE":       [ 11, None, "update req.", "aggiorna", "bijwerken", "uppdatering", "frissítés", "aktualizacja" , "Mise à jour", "Update notwendig" ],
+    "TEMPSET":      [ 12, None, "temp. settings", "imp. temperatura", "temperatuur inst.", "temperatur", "hőmérséklet beállítás", "ustawienie temperatury", "Réglage temp.", "Temperatureinstellungen"],
+    "CLIMAON":      [ 13, None, "climate control", "clima acceso", "airco", "klimat", "klíma", "klimatyzacja","Climatisation", "Klima" ],
+    "DEFROSTON":    [ 14, None, "defrost", "scongelamento", "ontdooien", "defrost", "páramentesítő", "rozmrożenie" ,"Dégivrage", "Defrostung"],
+    "REARWINDOWON": [ 15, None, "rear window heater", "lunotto termico", "achterruitverwarming", "bakrutevärme", "hátsó ablak", "tylne okno" ,"Dégivrage arrière", "Fenster hinten"],
+    "STEERINGWHEELON": [ 16, None, "steering wheel heater", "volante termico", "stuurverwarming", "rattvärme", "kormány", "kierownica" ,"Volant Chauffant", "Lenkrad"],
+    "SIDEMIRRORSON":[ 17, None, "side mirrors heater", "specchietti termici", "zijspiegel verwarming", "sidospeglar", "oldalsó tükrök", "lusterka boczne" , "Dégivrage rétroviseur", "Seitenspiegel" ],
+    "SEATFL":       [ 18, None, "seat front-left", "sedile guidatore", "bestuurdersstoel", "förarstol", "bal első ülés", "siedzenie przednie lewe" ,"Siège conducteur", "Sitz vorne links"],
+    "SEATFR":       [ 19, None, "seat front-right", "sedile passeggero", "bijrijdersstoel", "passagerarstol", "jobb első ülés", "siedzenie przednie prawe" ,"Siège passager", "Sitz vorne rechts"],
+    "SEATRL":       [ 20, None, "seat rear-left", "sedile post.sx", "achterbank links", "baksäte vänster", "bal hátsó ülés", "siedzenie tylne lewe", "Siège arrière conducteur", "Sitz hinten links" ],
+    "SEATRR":       [ 21, None, "seat rear-right", "sedile post.dx", "achterbank rechts", "baksäte höger", "jobb hátsó ülés", "siedzenie tylne prawe", "Siège arrière passager", "Sitz hinten rechts" ],
+    "OPEN":         [ 22, None, "open", "aperta", "open", "öppen", "nyitva", "otwarte", "ouvrir", "offen" ],
+    "TRUNK":        [ 23, None, "trunk open", "bagagliaio aperto", "kofferbak", "bagagelucka", "casomagtér nyitva", "bagażnik otwarty" , "coffre ouvert", "Kofferraum offen"],
+    "HOOD":         [ 24, None, "hood open", "cofano aperto", "motorkap", "motorhuv", "motorháztető nyitva", "pokrywa silnika otwarta" , "capot ouvert", "Motorhaube offen" ],
+    "12VBATT":      [ 25, None, "12V battery", "batteria 12V", "12V batterij", "batteri 12V", "12V akku", "akumulator 12V" , "Batterie 12V", "12V Batterie"],
+    "KEYBATT":      [ 26, None, "key battery", "batteria radiocomando", "batterij afstandsbediening", "nyckelbatteri", "kulcs elem", "bateria kluczyka", "Pile clé", "Schlüsselbatterie" ],
+    "WASHER":       [ 27, None, "washer fluid", "liquido tergicristallo", "ruitensproeiervloeistof", "spolarvätska", "ablakmosó", "płyn spryskiwaczy", "lave-glace", "Schweibenwischwasser" ],
+    "BRAKE":        [ 28, None, "brake fluid", "olio freni", "rem", "bromsvätska", "fékfolyadék", "płyn hamulcowy", "liquide de frein", "Bremsflüssigkeit" ],
+    "TIRES":        [ 29, None, "tyre pressure", "pressione gomme", "bandenspanning", "däcktryck", "guminyomás", "ciśnienie w oponie", "pression pneus", "Reifenluftdruck" ],
+    "CLIMATEMP":    [ 30, None, "climate temperature", "temperatura clima", "airco temperatuur", "klimattemperatur", "klíma hőfok", "temperatura klimatyzacji", "Température clim", "Klimatemperatur" ],
+    "EVLIMITAC": [ 31, None, "Charge limit AC", "Limite ricarica AC", "", "", "", "", "", "" ],
+    "EVLIMITDC": [ 32, None, "Charge limit DC", "Limite ricarica DC", "", "", "", "", "", "" ],
+    "EVCHARGEON": [ 33, None, "EV Charging", "In ricarica", "", "", "", "", "", "" ],
+    "EVENERGYCONS90DAYS": [ 34, None, "EV energy in 90d", "energia consumata in 90gg","EV verbruik 90d", "", "", "", "", "" ],
+    "EVESTCHGDURATION": [ 35, None, "estimated charge duration", "tempo ricarica stimata", "oplaadduur", "", "", "", "", "" ],
+    "EVTARGETCHGRANGE": [ 36, None, "Target Charge Range", "autonomia finale", "doelactieradius", "", "", "", "", "" ],
+    "EVENERGYREGEN90DAYS": [ 37, None, "EV energy Regen.90d", "energia rigenerata 90gg","EV opwek 90d", "", "", "", "", "" ],
+    "EVENERGYCONSTOTAL": [ 38, None, "EV energy Consumed", "energia consumata","EV verbruik", "", "", "", "", "" ],
+    "EVENERGYREGENTOTAL": [ 39, None, "EV energy Regenerated", "energia rigenerata","EV opwek", "", "", "", "", "" ],
 }
-
-#DEVLIST used to convert from unit to DEVS keyword (DEVS[DEVLIST[Unit&UNITMASK]])
-DEVLIST=[None, 'EVSTATE', 'EVBATTLEVEL', 'EVRANGE', 'FUELLEVEL', 'FUELRANGE', 'ENGINEON', 'ODOMETER', 'LOCATION', 'HOMEDIST', 'SPEED', 'UPDATE', 'TEMPSET', 'CLIMAON', 'DEFROSTON', 'REARWINDOWON', 'STEERINGWHEELON', 'SIDEMIRRORSON', 'SEATFL', 'SEATFR', 'SEATRL', 'SEATRR', 'OPEN', 'TRUNK', 'HOOD', '12VBATT', 'KEYBATT', 'WASHER', 'BRAKE', 'TIRES', 'CLIMATEMP', 'EVLIMITAC', 'EVLIMITDC', 'EVCHARGEON', 'EVENERGYCONS90DAYS', 'EVESTCHGDURATION', 'EVTARGETCHGRANGE', 'EVENERGYREGEN90DAYS', 'EVENERGYCONSTOTAL', 'EVENERGYREGENTOTAL']
 
 class BasePlugin:
     """ Base class for the plugin """
@@ -142,6 +139,7 @@ class BasePlugin:
         self._pollIntervalDriving = 30 # while charging, fetch data quickly 
         self.interval = 10              # current polling interval (depending by charging, moving, night time, ...) It's set by mustPoll()
         self._lastPoll = None           # last time I got vehicle status
+        self._checkDevices = True       # if True, check that all devices are created (at startup and when update is forced)
         self._setChargeLimits = 0       # if > 0 => decrement every HeartBeat interval, and when zero set the charging limit
         self._fetchingData = 0          # 0 if system is not fetching data from cloud, >0 if it's fetching (incremented every onHeartBeat)
         self._isCharging = False  
@@ -149,7 +147,6 @@ class BasePlugin:
         self._lang = "en"
         self._vehicleLoc = {}           # saved location for vehicles
         self._name2vehicleId = {}
-        self.vehileName = ""            # Name for each vehicle, used by updateDevices() and update()
         self._getAddress = 1            # force device to get address associated to the current latitude/longitude
         self.vm = None
         self.verbose=True                  # if 1 => add extra debugging messages. Default: False
@@ -165,32 +162,24 @@ class BasePlugin:
             vehicleId = False
             self.getDevID(Unit)
             Domoticz.Status(f"Device Name={Devices[self.devID].Units[Unit].Name}")
-            self.vehicleName=re.findall(f"([a-zA-Z0-9-_]+): .*", Devices[self.devID].Units[Unit].Name)[0]
+            name=re.findall(f"([a-zA-Z0-9-_]+): .*", Devices[self.devID].Units[Unit].Name)[0]
             if self._name2vehicleId == {}:
                 # call onHeartbeat to load vehicles data
                 Domoticz.Status("_name2vehicleId is empty => call onHeartBeat to init vehicles data")
+                self.checkDevices = True
                 self._lastPoll = None
                 self.onHeartbeat()
 
-            if self.vehicleName in self._name2vehicleId:
+            if name in self._name2vehicleId:
                 vehicleId=self._name2vehicleId[name]
-                Domoticz.Status(f"name={self.vehicleName} vehicleId={vehicleId} Unit={Unit}")
+                Domoticz.Status(f"name={name} vehicleId={vehicleId} Unit={Unit}")
             else:
                 # vehicleId not found
-                Domoticz.Status(f"Vehicle ID not found: there is not a vehicle named {self.vehicleName} in the Hyundai/Kia cloud")
+                Domoticz.Status(f"Vehicle ID not found: there is not a vehicle named {name} in the Hyundai/Kia cloud")
             return vehicleId
 
     def update(self, Unit, nValue, sValue):
         """ update device with DeviceID=self.devID, Unit=Unit, nValue=nValue, sValue=sValue """
-        #Domoticz.Status(f"Update({Unit}, {nValue}, {sValue}) devID={self.devID}") 
-        if Unit>=256:
-            Domoticz.Error(f"No enough space to store new devices: max 4 vehicles!")
-            return
-        if (self.devID not in Devices) or (Unit not in Devices[self.devID].Units):
-            dev=DEVS[DEVLIST[Unit&UNITMASK]]
-            Domoticz.Status(f"Creating device {dev[0]} {dev[LANGBASE]}...")
-            Domoticz.Unit(DeviceID=self.devID, Unit=Unit, Name=f"{self.vehicleName}: {dev[self._devlang] or dev[LANGBASE]}", Type=dev[1], Subtype=dev[2], Switchtype=dev[3], Options=dev[4], Used=1).Create()
-
         Devices[self.devID].Units[Unit].nValue=int(nValue)
         Devices[self.devID].Units[Unit].sValue=str(sValue)
         Devices[self.devID].Units[Unit].Update()
@@ -287,20 +276,20 @@ class BasePlugin:
                 for k in self.vm.vehicles:
                     # k is the keyword associated to a Vehicle object
                     v = self.vm.get_vehicle(k)
-                    self.vehicleName = re.sub(r'\W+', '', v.name)   # must be unique and identify the type of car, if more than 1 car is owned
-                    if self.vehicleName not in self._name2vehicleId:
-                        self._name2vehicleId[self.vehicleName]=k   # save the corresponding between vehicle name and id in vm.vehicles dict
+                    name = re.sub(r'\W+', '', v.name)   # must be unique and identify the type of car, if more than 1 car is owned
+                    if name not in self._name2vehicleId:
+                        self._name2vehicleId[name]=k   # save the corresponding between vehicle name and id in vm.vehicles dict
                     if hasattr(v,'v.ev_battery_percentage') and v.ev_battery_percentage != None:
                         batterySOC=v.ev_battery_percentage
                     else: 
                         batterySOC=0
                         
-                    Domoticz.Status(f"Name={self.vehicleName} Odometer={v._odometer_value}{v._odometer_unit} Battery={batterySOC}")
-
+                    Domoticz.Status(f"Name={name} Odometer={v._odometer_value}{v._odometer_unit} Battery={batterySOC}")
+                    Domoticz.Status(f"Vehicle=")
                     # split v structure in more lines (too big to be printed in one line)
                     var=str(v)
-                    for i in range(0,len(var),4000):    
-                        Domoticz.Status(var[i:i+4000])
+                    for i in range(0,len(var),4096):
+                        Domoticz.Status(var[i:i+4096])
                 
                     # base = Unit base = 0, 64, 128, 192 # up to 4 vehicles can be addressed, 64 devices per vehicle (Unit <= 255)
                     # Find the right Unit for the current car
@@ -309,24 +298,27 @@ class BasePlugin:
                     for base in range(0, 256-1, UNITMASK+1):
                         unit=base+(DEVS['ODOMETER'][0]); self.getDevID(unit)
                         if self.devID in Devices and unit in Devices[self.devID].Units:
-                            if self.vehicleName in Devices[self.devID].Units[unit].Name:   
+                            if name in Devices[self.devID].Units[unit].Name:   
                                 # odometer exists: check that Domoticz device name correspond with vehicle name (set on Kia connect)
                                 found=1
                                 break
                         else:
                             if baseFree > base:
                                 baseFree = base # free base where devices can be stored
+
                     if found==0:    
                         # car not found, but there is enough space for a new car
                         if baseFree < 256:  # Add new devices for this new car
                             base = baseFree
-                            found=1    # set found=1 to let device updating
+                            self.addDevices(base, name, v)
+                            found==1    # set found==1 to let device updating
                         else: # car not found, but no space for a new car (max 4!)
                             Domoticz.Error("No more space to store another vehicle (max 4 vehicles are supported)")
-                    if found==1: # car found or enough space to create devices for this car
-                        # update devices: if one or more devices do not exist, create it/them
-                        self.updateDevices(base, v) 
+                    if found==1: # car found or just created: update values
+                        if self._checkDevices == True: self.addDevices(base, name, v)
+                        self.updateDevices(base, name, v)
 
+                self._checkDevices=False
                 self._fetchingData=0    # fetching data from API ended correctly
         else:
             #self._fetchingData>1 => system is fetching data from cloud
@@ -345,6 +337,7 @@ class BasePlugin:
             if Command=="On":
                 if self._fetchingData == 0:
                     Domoticz.Status("Force update command")
+                    self._checkDevices = True
                     self._lastPoll = None
                     self.interval=1
                     self.onHeartbeat()
@@ -416,12 +409,337 @@ class BasePlugin:
                     self.update(Unit, 0, "Off")
                     ret=self.vm.stop_charge(vehicleId)
 
+    def addDevices(self, base, name, v):
+        """ Add devices for car named {name}, starting from base unit {base}, using vehicle parameters in {v} """
+        Domoticz.Status(f"Add devices for car {name} with base index {base}")
 
-    def updateDevices(self, base, v):
-        """ Update devices for car named {self.vehicleName}, starting from base unit {base}, using vehicle parameters in {v}. If a device does not exist, automatically create it """
+        k='EVSTATE'; dev=DEVS[k]
+        if hasattr(v,'ev_battery_is_charging'):
+            dev[1]='ev_battery_is_charging'
+        if dev[1]!=None: 
+            var=getattr(v, dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units): 
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=19, Used=1).Create()
+
+                k='EVCHARGEON'; dev=DEVS[k]
+                unit=base+dev[0]; self.getDevID(unit)
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+
+        k='EVBATTLEVEL'; dev=DEVS[k]
+        if hasattr(v,'ev_battery_percentage'):
+            dev[1] = 'ev_battery_percentage'; unit=base+dev[0]; self.getDevID(unit)
+            var=getattr(v, dev[1], None)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
+
+        k='EVRANGE'; dev=DEVS[k]
+        if hasattr(v,'_ev_driving_range'):
+            dev[1]='_ev_driving_range'
+        elif hasattr(v,'ev_driving_distance'):  #older name
+            dev[1]='ev_driving_distance'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None)
+            # now check for unit of measure
+            var2='km'
+            if hasattr(v, '_ev_driving_range_unit'):
+                var2=v._ev_driving_range_unit
+            elif hasattr(v, '_ev_driving_distance_unit'):
+                var2=v._ev_driving_distance_unit
+            unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+var2}, Used=1).Create()
+
+        k='EVLIMITAC'; dev=DEVS[k]
+        if hasattr(v,'ev_charge_limits_ac'):
+            dev[1]='ev_charge_limits_ac'
+        elif hasattr(v,'_ev_charge_limits.ac'):
+            dev[1]='ev_charge_limits.ac'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=62, Switchtype=7, Used=1).Create()
+
+        k='EVLIMITDC'; dev=DEVS[k]
+        if hasattr(v, 'ev_charge_limits_dc'):
+            dev[1]='ev_charge_limits_dc'
+        elif hasattr(v, '_ev_charge_limits.dc'):
+            dev[1]='_ev_charge_limits.dc'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=62, Switchtype=7, Used=1).Create()
+
+        k='FUELLEVEL'; dev=DEVS[k]
+        if hasattr(v, 'fuel_level'):
+            dev[1]='fuel_level'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
+
+        k='FUELRANGE'; dev=DEVS[k]
+        if hasattr(v, '_fuel_driving_range'):
+            dev[1]='_fuel_driving_range'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._fuel_driving_range_unit}, Used=1).Create()
+
+        k='ENGINEON'; dev=DEVS[k]
+        if hasattr(v, 'engine_is_running'):
+            dev[1] =  'engine_is_running'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+
+        k='ODOMETER'; dev=DEVS[k]
+        if hasattr(v, 'odometer'):
+            dev[1] =  'odometer'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=113, Subtype=0, Switchtype=3, Used=1).Create()
+
+
+        k='LOCATION'; dev=DEVS[k]
+        if hasattr(v, 'location_latitude'):
+            dev[1] =  'location_latitude'
+        elif hasattr(v, '_location_latitude'):
+            dev[1] = '_location_latitude'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=19, Used=1).Create()
+
+                dev=DEVS['HOMEDIST']; unit=base+dev[0]; self.getDevID(unit)
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Used=1).Create()
+
+        k='SPEED'; dev=DEVS[k]
+        if hasattr(v, 'data'):
+            dev[1] =  'data'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Used=1).Create()
+            
+        dev=DEVS['UPDATE']; unit=base+dev[0]; self.getDevID(unit)
+        if (self.devID not in Devices or unit not in Devices[self.devID].Units):
+            Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create() 
+
+        k='CLIMAON'; dev=DEVS[k]
+        if hasattr(v, 'air_control_is_on'):
+            dev[1] =  'air_control_is_on'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+
+        k='CLIMATEMP'; dev=DEVS[k]
+        if hasattr(v, '_air_temperature'):
+            dev[1] =  '_air_temperature'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=242, Subtype=1, Used=1).Create()
+
+        k='DEFROSTON'; dev=DEVS[k]
+        if hasattr(v, 'defrost_is_on'):
+            dev[1] =  'defrost_is_on'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+
+        k='REARWINDOWON'; dev=DEVS[k]
+        if hasattr(v, 'back_window_heater_is_on'):
+            dev[1] =  'back_window_heater_is_on'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+
+        k='STEERINGWHEELON'; dev=DEVS[k]
+        if hasattr(v, 'steering_wheel_heater_is_on'):
+            dev[1] =  'steering_wheel_heater_is_on'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+
+        k='SIDEMIRRORSON'; dev=DEVS[k]
+        if hasattr(v, 'side_mirror_heater_is_on'):
+            dev[1] =  'side_mirror_heater_is_on'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Used=1).Create()
+
+        k='SEATFL'; dev=DEVS[k]
+        if hasattr(v, 'front_left_seat_status'):
+            dev[1] =  'front_left_seat_status'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=19, Used=1).Create()
+
+        k='SEATFR'; dev=DEVS[k]
+        if hasattr(v, 'front_right_seat_status'):
+            dev[1] =  'front_right_seat_status'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=19, Used=1).Create()
+
+        k='SEATRL'; dev=DEVS[k]
+        if hasattr(v, 'rear_left_seat_status'):
+            dev[1] =  'rear_left_seat_status'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=19, Used=1).Create()
+
+        k='SEATRR'; dev=DEVS[k]
+        if hasattr(v, 'rear_right_seat_status'):
+            dev[1] =  'rear_right_seat_status'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=19, Used=1).Create()
+
+        k='OPEN'; dev=DEVS[k]
+        if hasattr(v, 'is_locked'):
+            dev[1] =  'is_locked'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Switchtype=19, Used=1).Create()
+
+        k='TRUNK'; dev=DEVS[k]
+        if hasattr(v, 'trunk_is_open'):
+            dev[1] =  'trunk_is_open'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Switchtype=11, Used=1).Create()
+
+        k='HOOD'; dev=DEVS[k]
+        if hasattr(v, 'hood_is_open'):
+            dev[1] =  'hood_is_open'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=244, Subtype=73, Switchtype=11, Used=1).Create()
+
+        k='12VBATT'; dev=DEVS[k]
+        if hasattr(v, 'car_battery_percentage'):
+            dev[1] =  'car_battery_percentage'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=6, Used=1).Create()
+
+        k='KEYBATT'; dev=DEVS[k]
+        if hasattr(v, 'smart_key_battery_warning_is_on'):
+            dev[1] =  'smart_key_battery_warning_is_on'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=22, Used=1).Create()
+
+        k='WASHER'; dev=DEVS[k]
+        if hasattr(v, 'washer_fluid_warning_is_on'):
+            dev[1] =  'washer_fluid_warning_is_on'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=22, Used=1).Create()
+
+        k='BRAKE'; dev=DEVS[k]
+        if hasattr(v, 'brake_fluid_warning_is_on'):
+            dev[1] =  'brake_fluid_warning_is_on'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=22, Used=1).Create()
+
+        k='TIRES'; dev=DEVS[k]
+        if hasattr(v, 'tire_pressure_all_warning_is_on'):
+            dev[1] =  'tire_pressure_all_warning_is_on'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=22, Used=1).Create()
+
+        Domoticz.Status("DEBUG: EVENERGYCONS90DAYS: create device?")
+        k='EVENERGYCONS90DAYS'; dev=DEVS[k]
+        # note the total power provided by hyundai/kia cloud is actually the total for 90 days
+        if hasattr(v, 'total_power_consumed'):
+            dev[1] =  'total_power_consumed'
+            Domoticz.Status("DEBUG No, total_power_consumed does not exist!")
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            Domoticz.Status("DEBUG probably yes")
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Status("Creating device {dev[self._devlang] or dev[LANGBASE]}")
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=113, Subtype=0, Switchtype=0, Used=1).Create()
+
+        k='EVESTCHGDURATION'; dev=DEVS[k]
+        if hasattr(v, '_ev_estimated_current_charge_duration'):
+            dev[1]= '_ev_estimated_current_charge_duration'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._ev_estimated_current_charge_duration_unit}, Used=1).Create()
+
+        k='EVTARGETCHGRANGE'; dev=DEVS[k]
+        if hasattr(v, '_ev_target_range_charge_AC'):
+            dev[1]= '_ev_target_range_charge_AC'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=31, Options={'Custom': '1;'+v._ev_target_range_charge_AC_unit}, Used=1).Create()
+
+
+        k='EVENERGYREGEN90DAYS'; dev=DEVS[k]
+        # note the total power provided by hyundai/kia cloud is actually the total for 90 days
+        if hasattr(v, 'total_power_regenerated'):
+            dev[1] =  'total_power_regenerated'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=113, Subtype=0, Switchtype=0, Used=1).Create()
+
+        k='EVENERGYCONSTOTAL'; dev=DEVS[k]
+        # the all time total power consumed will be tracked using daily stats values from the cloud onto an incremental counter      
+        if hasattr(v, 'daily_stats'):
+            dev[1] = 'daily_stats'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                self.firstRun=True
+                Domoticz.Status(f"creating device {k}")
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=28, Switchtype=0, Used=1).Create()
+                self.update(unit, 0, "0")
+
+        k='EVENERGYREGENTOTAL'; dev=DEVS[k]
+        # the all time total power regenerated will be tracked using daily stats values from the cloud onto an incremental counter      
+        if hasattr(v, 'daily_stats'):
+            dev[1] = 'daily_stats'
+        if dev[1]!=None:
+            var=getattr(v,dev[1], None); unit=base+dev[0]; self.getDevID(unit)
+            if var != None and (self.devID not in Devices or unit not in Devices[self.devID].Units):
+                self.firstRun=True
+                Domoticz.Status(f"creating device {k}")
+                Domoticz.Unit(DeviceID=self.devID, Unit=unit, Name=f"{name}: {dev[self._devlang] or dev[LANGBASE]}", Type=243, Subtype=28, Switchtype=0, Used=1).Create()
+                self.update(unit, 0, "0")
+    
+
+    def updateDevices(self, base, name, v):
+        """ Update devices for car named {name}, starting from base unit {base}, using vehicle parameters in {v} """
         Domoticz.Status(f"Car found at base {base}")
 
-        k='EVSTATE'; dev=DEVS[k]; var=getattr(v, 'ev_battery_is_charging', None)
+        k='EVSTATE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         var2=getattr(v, 'ev_battery_is_plugged_in', 0)
         if var != None:
             nValue=0
@@ -441,46 +759,43 @@ class BasePlugin:
             unit=base+DEVS['EVCHARGEON'][0]; self.getDevID(unit); self.update(unit, nValue, sValue)
         
         batteryLevel=None   # show batteryLevel in the debug messages
-        k='EVBATTLEVEL'; dev=DEVS[k]; var=getattr(v, 'ev_battery_percentage', None)
+        k='EVBATTLEVEL'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=var
             if self.verbose: Domoticz.Status(f"{k}={var}")
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, str(nValue))
         
-        k='EVRANGE'; dev=DEVS[k]; var=getattr(v, '_ev_driving_range', None)
-        if var == None: var=getattr(v, 'ev_driving_distance', None)
+        k='EVRANGE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=int(var)
             if self.verbose: Domoticz.Status(f"{k}={var}")
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, str(nValue))
             
-        k='EVLIMITAC'; dev=DEVS[k]; var=getattr(v, 'ev_charge_limits_ac', None)
-        if var==None: var=getattr(v, '_ev_charge_limits.ac', None)
+        k='EVLIMITAC'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=var
             if self.verbose: Domoticz.Status(f"{k}={var}")
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, str(nValue))
             
-        k='EVLIMITDC'; dev=DEVS[k]; var=getattr(v, 'ev_charge_limits_dc', None)
-        if var==None: var=getattr(v, '_ev_charge_limits.dc', None)
+        k='EVLIMITDC'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=var
             if self.verbose: Domoticz.Status(f"{k}={var}")
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, str(nValue))
             
-        k='FUELLEVEL'; dev=DEVS[k]; var=getattr(v, 'fuel_level', None)
+        k='FUELLEVEL'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=var
             if self.verbose: Domoticz.Status(f"{k}={var}")
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, str(nValue))
             
-        k='FUELRANGE'; dev=DEVS[k]; var=getattr(v, '_fuel_driving_range', None)
+        k='FUELRANGE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=int(var)
             if self.verbose: Domoticz.Status(f"{k}={var}")
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, str(nValue))
             
-        k='ENGINEON'; dev=DEVS[k]; var=getattr(v, 'engine_is_running', None)
+        k='ENGINEON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             value=var
             if self.verbose: Domoticz.Status(f"{k}={var}")
@@ -490,7 +805,7 @@ class BasePlugin:
                 self._engineOn=True
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='ODOMETER'; dev=DEVS[k]; var=getattr(v, 'odometer', None)
+        k='ODOMETER'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None and var != 0:
             nValue=var
             if self.verbose: Domoticz.Status(f"{k}={var}")
@@ -511,11 +826,11 @@ class BasePlugin:
             lon=getattr(v, '_location_longitude')
 
         if lat!=None and lon!=None:
-            if self.vehicleName not in self._vehicleLoc:
+            if name not in self._vehicleLoc:
                 #initialize vehicleLoc
-                self._vehicleLoc[self.vehicleName]={'latitude': lat, 'longitude': lon+0.000001} # initialize variable but force a minimum variation to compute the real position
+                self._vehicleLoc[name]={'latitude': lat, 'longitude': lon+0.000001} # initialize variable but force a minimum variation to compute the real position
 
-            if self._getAddress==1 or lat!=self._vehicleLoc[self.vehicleName]['latitude'] or lon!=self._vehicleLoc[self.vehicleName]['longitude']:
+            if self._getAddress==1 or lat!=self._vehicleLoc[name]['latitude'] or lon!=self._vehicleLoc[name]['longitude']:
                 # LOCATION changed or not previously set
                 # get address
                 if self.verbose: Domoticz.Status(f"Latitude or Longitude have changed")
@@ -544,16 +859,16 @@ class BasePlugin:
                         nValue=value['vehicleLocation']['speed']['value']
                         sValue=str(nValue)
                         unit=base+DEVS['SPEED'][0]; self.getDevID(unit); self.update(unit, nValue, sValue)
-                        Domoticz.Status(f"Vehicle {self.vehicleName} has odometer={v.odometer} speed={nValue} distance_from_home={distance} EV battery={batteryLevel}%")
+                        Domoticz.Status(f"Vehicle {name} has odometer={v.odometer} speed={nValue} distance_from_home={distance} EV battery={batteryLevel}%")
 
-                self._vehicleLoc[self.vehicleName]['latitude']=lat
-                self._vehicleLoc[self.vehicleName]['longitude']=lon
+                self._vehicleLoc[name]['latitude']=lat
+                self._vehicleLoc[name]['longitude']=lon
             else:
                 if self.verbose: Domoticz.Status(f"Latitude or Longitude NOT changed: lat={lat}, lon={lon}")
         else: 
             if self.verbose: Domoticz.Status(f"Latitude or Longitude NOT found")
 
-        k='CLIMAON'; dev=DEVS[k]; var=getattr(v, 'air_control_is_on', None)
+        k='CLIMAON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             value=var
@@ -561,145 +876,147 @@ class BasePlugin:
             sValue="On" if value else "Off"
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
 
-        k='CLIMATEMP'; dev=DEVS[k]; var=getattr(v, '_air_temperature', None)
+        k='CLIMATEMP'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             nValue=float(var)
             if self.verbose: Domoticz.Status(f"{k}={var}")
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, nValue)
             
-        k='DEFROSTON'; dev=DEVS[k]; var=getattr(v, 'defrost_is_on', None)
+        k='DEFROSTON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=1 if var else 0
             sValue="On" if var else "Off"
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='REARWINDOWON'; dev=DEVS[k]; var=getattr(v, 'back_window_heater_is_on', None)
+        k='REARWINDOWON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue="On" if var>0 else "Off"
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='STEERINGWHEELON'; dev=DEVS[k]; var=getattr(v, 'steering_wheel_heater_is_on', None)
+        k='STEERINGWHEELON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue="On" if var>0 else "Off"
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
 
-        k='SIDEMIRRORSON'; dev=DEVS[k]; var=getattr(v, 'side_mirror_heater_is_on', None)
+        k='SIDEMIRRORSON'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=1 if var else 0
             sValue="On" if var else "Off"
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='SEATFL'; dev=DEVS[k]; var=getattr(v, 'front_left_seat_status', None)
+        k='SEATFL'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=0; sValue=var
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='SEATFR'; dev=DEVS[k]; var=getattr(v, 'front_right_seat_status', None)
+        k='SEATFR'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=0; sValue=var
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='SEATRL'; dev=DEVS[k]; var=getattr(v, 'rear_left_seat_status', None)
+        k='SEATRL'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=0; sValue=var
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
            
-        k='SEATRR'; dev=DEVS[k]; var=getattr(v, 'rear_right_seat_status', None)
+        k='SEATRR'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=0; sValue=var
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='OPEN'; dev=DEVS[k]; var=getattr(v, 'is_locked', None)
+        k='OPEN'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=1 if var else 0
             sValue="Unlocked" if var else "Locked"
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='TRUNK'; dev=DEVS[k]; var=getattr(v, 'trunk_is_open', None)
+        k='TRUNK'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=1 if var else 0
             sValue="Open" if var else "Closed"
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='HOOD'; dev=DEVS[k]; var=getattr(v, 'hood_is_open', None)
+        k='HOOD'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=1 if var else 0
             sValue="Open" if var else "Closed"
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='12VBATT'; dev=DEVS[k]; var=getattr(v, 'car_battery_percentage', None)
+        k='12VBATT'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue=str(nValue)
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='KEYBATT'; dev=DEVS[k]; var=getattr(v, 'smart_key_battery_warning_is_on', None)
+        k='KEYBATT'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue="Ok" if nValue == 0 else "Low"
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='WASHER'; dev=DEVS[k]; var=getattr(v, 'washer_fluid_warning_is_on', None)
+        k='WASHER'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue="Ok" if nValue == 0 else "Empty"
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='BRAKE'; dev=DEVS[k]; var=getattr(v, 'brake_fluid_warning_is_on', None)
+        k='BRAKE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue="Ok" if nValue == 0 else "Empty"
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
-        k='TIRES'; dev=DEVS[k]; var=getattr(v, 'tire_pressure_all_warning_is_on', None)
+        k='TIRES'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nValue=var
             sValue="Ok" if nValue == 0 else "Low"
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
 
-        k='EVENERGYCONS90DAYS'; dev=DEVS[k]; var=getattr(v, 'total_power_consumed', None)
+        k='EVENERGYCONS90DAYS'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None and var != 0:
             nValue=var
             if self.verbose: Domoticz.Status(f"{k}={var}")
-            nValue=int(nValue); 
-            unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, nValue)
+            nValue=int(nValue); sValue=str(sValue)
+#            unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
+            Domoticz.Status(f"Updated {k}={var}")
 
-        k='EVESTCHGDURATION'; dev=DEVS[k]; var=getattr(v, '_ev_estimated_current_charge_duration', None)
+        """ DEBUG
+        k='EVESTCHGDURATION'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            nValue=int(var); 
+            nValue=int(var); sValue=str(sValue)
             if self.verbose: Domoticz.Status(f"{k}={var}")
-            unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, nValue)
+            unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
 
-        k='EVTARGETCHGRANGE'; dev=DEVS[k]; var=getattr(v, '_ev_target_range_charge_AC', None)
+        k='EVTARGETCHGRANGE'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None:
-            nValue=int(var); 
+            nValue=int(var); sValue=str(sValue)
             if self.verbose: Domoticz.Status(f"{k}={var}")
-            unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, nValue)
+            unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
 
-        k='EVENERGYREGEN90DAYS'; dev=DEVS[k]; var=getattr(v, 'total_power_regenerated', None)
+        k='EVENERGYREGEN90DAYS'; dev=DEVS[k]; var=getattr(v, dev[1], None)
         if var != None and var != 0:
             nValue=var
             if self.verbose: Domoticz.Status(f"{k}={var}")
-            nValue=int(nValue)
-            unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, nValue)
+            nValue=int(nValue); sValue=str(sValue)
+            unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
 
         if hasattr(v, 'daily_stats') and self.firstRun==False:
             var=getattr(v,'daily_stats',None)
@@ -724,14 +1041,11 @@ class BasePlugin:
             if todayPwrConsumed>0:
                 k='EVENERGYCONSTOTAL'; dev=DEVS[k]
                 unit=base+dev[0]; self.getDevID(unit)
-                if self.devID in Devices:
-                    TotalPwrConsID=Devices[self.devID].Units[unit].ID
-                    result,Counter,CounterToday=getCounter(TotalPwrConsID)
-                else:
-                    result=True; Counter=todayPwrConsumed; CounterToday=todayPwrConsumed    # Device does not exist yet: initialize to the current value
+                TotalPwrConsID=Devices[self.devID].Units[unit].ID
+                result,Counter,CounterToday=getCounter(TotalPwrConsID)
                 if result:
                     incrementValue=todayPwrConsumed-CounterToday
-                    Domoticz.Status(f"Energy consumed Counter {Counter} counterToday {CounterToday} daily stat {todayPwrConsumed} Increment {incrementValue}") 
+                    Domoticz.Status(f"PwrConsumed Counter {Counter} counterToday {CounterToday} daily stat {todayPwrConsumed} Increment {incrementValue}") 
                     nValue=0; sValue=str(incrementValue)
                     unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
                 else:
@@ -740,11 +1054,8 @@ class BasePlugin:
             if todayPwrRegenerated>0:
                 k='EVENERGYREGENTOTAL'; dev=DEVS[k]
                 unit=base+dev[0]; self.getDevID(unit)
-                if self.devID in Devices:
-                    TotalPwrRegenID=Devices[self.devID].Units[unit].ID
-                    result,Counter,CounterToday=getCounter(TotalPwrRegenID)
-                else:
-                    result=True; Counter=todayPwrRegenerated; CounterToday=todayPwrRegenerated    # Device does not exist yet: initialize to the current value
+                TotalPwrRegenID=Devices[self.devID].Units[unit].ID
+                result,Counter,CounterToday=getCounter(TotalPwrRegenID)
                 if result:
                     incrementValue=todayPwrRegenerated-CounterToday
                     Domoticz.Status(f"PwrRegenerated Counter {Counter} counterToday {CounterToday} daily stat {todayPwrRegenerated} Increment {incrementValue}")
@@ -755,8 +1066,10 @@ class BasePlugin:
         else:
             if self.firstRun==True:
                 Domoticz.Status(f"Not updating new PWR devices on first run with today's values")
+        """
 
 
+        if self.verbose: Domoticz.Status(f"updateDevices() completed!")
         # Reset force update button
         nValue=0; sValue="Off"
         unit=base+DEVS['UPDATE'][0]; self.getDevID(unit); self.update(unit, nValue, sValue)
