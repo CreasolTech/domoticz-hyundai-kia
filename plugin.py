@@ -11,9 +11,9 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="2.0" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="2.1" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
-        <h2>Domoticz Hyundai Kia connect plugin - 2.0</h2>
+        <h2>Domoticz Hyundai Kia connect plugin - 2.1</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
         tyres status, door lock status, and much more.<br/>
         <b>Before activating this plugin, assure that you've set the right name to your car</b> (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.<br/>
@@ -173,7 +173,7 @@ class BasePlugin:
                 self.onHeartbeat()
 
             if self.vehicleName in self._name2vehicleId:
-                vehicleId=self._name2vehicleId[name]
+                vehicleId=self._name2vehicleId[self.vehicleName]
                 Domoticz.Status(f"name={self.vehicleName} vehicleId={vehicleId} Unit={Unit}")
             else:
                 # vehicleId not found
@@ -396,7 +396,7 @@ class BasePlugin:
                     ret=self.vm.lock(vehicleId)
                     self.update(Unit, 1, "On")
                 else:   # Off command => unlock
-                    Domoticz.Error(f"unlock command")
+                    Domoticz.Log(f"unlock command")
                     ret=self.vm.unlock(vehicleId)
                     self.update(Unit, 0, "Off")
             elif (Unit&UNITMASK) == DEVS["EVLIMITAC"][0] or (Unit&UNITMASK) == DEVS["EVLIMITDC"][0]:
@@ -520,7 +520,7 @@ class BasePlugin:
                 # get address
                 if self.verbose: Domoticz.Status(f"Latitude or Longitude have changed")
                 get_address_url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&lat=' + str(lat) + '&lon=' + str(lon)
-                response = requests.get(get_address_url)
+                response = requests.get(get_address_url, headers={'User-Agent': 'Domoticz Hyundai/Kia plugin'})
                 if response.status_code == 200:
                     response = json.loads(response.text)
                     locAddr=response['display_name']
