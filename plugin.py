@@ -15,7 +15,7 @@
     <description>
         <h2>Domoticz Hyundai Kia connect plugin - 2.1</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
-        tyres status, door lock status, and much more.<br/>
+        tires status, door lock status, and much more.<br/>
         <b>Before activating this plugin, assure that you've set the right name to your car</b> (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.<br/>
         Also, do not change the name of the ODOMETER device!<br/>
     </description>
@@ -118,7 +118,7 @@ DEVS={ #topic:      [ unit, Type, Subtype, Switchtype, "en name", "it name", "nl
     "KEYBATT":      [ 26, 243, 22, 0, {}, "key battery", "batteria radiocomando", "batterij afstandsbediening", "nyckelbatteri", "kulcs elem", "bateria kluczyka", "Pile clé", "Schlüsselbatterie" ],
     "WASHER":       [ 27, 243, 22, 0, {}, "washer fluid", "liquido tergicristallo", "ruitensproeiervloeistof", "spolarvätska", "ablakmosó", "płyn spryskiwaczy", "lave-glace", "Schweibenwischwasser" ],
     "BRAKE":        [ 28, 243, 22, 0, {}, "brake fluid", "olio freni", "rem", "bromsvätska", "fékfolyadék", "płyn hamulcowy", "liquide de frein", "Bremsflüssigkeit" ],
-    "TIRES":        [ 29, 243, 22, 0, {}, "tyre pressure", "pressione gomme", "bandenspanning", "däcktryck", "guminyomás", "ciśnienie w oponie", "pression pneus", "Reifenluftdruck" ],
+    "TIRES":        [ 29, 243, 22, 0, {}, "tires pressure", "pressione gomme", "bandenspanning", "däcktryck", "guminyomás", "ciśnienie w oponie", "pression pneus", "Reifenluftdruck" ],
     "CLIMATEMP":    [ 30, 242, 1, 0, {'ValueStep':'0.5', 'ValueMin':'15', 'ValueMax':'27', 'ValueUnit':'°C'}, "climate temperature", "temperatura clima", "airco temperatuur", "klimattemperatur", "klíma hőfok", "temperatura klimatyzacji", "Température clim", "Klimatemperatur" ],
     "EVLIMITAC": [ 31, 244, 62, 7, {}, "Charge limit AC", "Limite ricarica AC", "", "", "", "", "", "" ],
     "EVLIMITDC": [ 32, 244, 62, 7, {}, "Charge limit DC", "Limite ricarica DC", "", "", "", "", "", "" ],
