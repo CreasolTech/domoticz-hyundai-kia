@@ -812,7 +812,7 @@ def getCounter(varIDX):
             counterTodayValue=int(divider*float(str(response.json()["result"][0]["CounterToday"]).split()[0]))
             responseResult=True
     except:
-        Domoticz.Error(f"ERROR: unable to retrieve the value of device with IDX {varIDX} {response}")
+        Domoticz.Error(f"ERROR: unable to retrieve the value of device with IDX {varIDX} {response}\nURL={apiCall}")
         responseResult=False
         counterValue=None
         counterTodayValue=None
