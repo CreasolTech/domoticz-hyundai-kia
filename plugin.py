@@ -457,16 +457,24 @@ class BasePlugin:
         k='EVLIMITAC'; dev=DEVS[k]; var=getattr(v, 'ev_charge_limits_ac', None)
         if var==None: var=getattr(v, '_ev_charge_limits.ac', None)
         if var != None:
-            nValue=var
             if self.verbose: Domoticz.Status(f"{k}={var}")
-            unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, str(nValue))
+            nVar=int(var)
+            nValue=2
+            sValue=var
+            if nVar==100: nValue=1
+            if nVar==0: nValue=0
+            unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
         k='EVLIMITDC'; dev=DEVS[k]; var=getattr(v, 'ev_charge_limits_dc', None)
         if var==None: var=getattr(v, '_ev_charge_limits.dc', None)
         if var != None:
-            nValue=var
             if self.verbose: Domoticz.Status(f"{k}={var}")
-            unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, str(nValue))
+            nVar=int(var)
+            nValue=2
+            sValue=var
+            if nVar==100: nValue=1
+            if nVar==0: nValue=0
+            unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
         k='FUELLEVEL'; dev=DEVS[k]; var=getattr(v, 'fuel_level', None)
         if var != None:
