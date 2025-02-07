@@ -11,9 +11,9 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="2.1" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="2.2" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
-        <h2>Domoticz Hyundai Kia connect plugin - 2.1</h2>
+        <h2>Domoticz Hyundai Kia connect plugin - 2.2</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
         tires status, door lock status, and much more.<br/>
         <b>Before activating this plugin, assure that you've set the right name to your car</b> (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.<br/>
@@ -42,8 +42,8 @@
                 <option label="20 minutes" value="20" />
                 <option label="30 minutes" value="30" />
                 <option label="60 minutes" value="60" />
-                <option label="120 minutes" value="120" default="true" />
-                <option label="240 minutes" value="240" />
+                <option label="120 minutes" value="120"/>
+                <option label="240 minutes" value="240" default="true" />
                 <option label="480 minutes" value="480" />
                 <option label="720 minutes" value="720" />
             </options>
@@ -138,7 +138,7 @@ class BasePlugin:
     """ Base class for the plugin """
 
     def __init__(self):
-        self._pollInterval = 120        # fetch data every 120 minutes, by default (but check parameter Mode1!)
+        self._pollInterval = 240        # fetch data every 120 minutes, by default (but check parameter Mode1!)
         self._pollIntervalDriving = 30 # while charging, fetch data quickly 
         self.interval = 10              # current polling interval (depending by charging, moving, night time, ...) It's set by mustPoll()
         self._lastPoll = None           # last time I got vehicle status
@@ -207,9 +207,9 @@ class BasePlugin:
             self.interval = self._pollIntervalDriving   # while charging or driving, reduce the poll interval
         elif self._isCharging:
             self.interval = self._pollIntervalDriving*2
-        elif datetime.now().hour>=22 or datetime.now().hour<6:
+        elif datetime.now().hour>=20 or datetime.now().hour<7:
             self.interval*=4     # reduce polling during the night
-            if self.interval > 120: self.interval = 120
+            if self.interval > 720: self.interval = 720
         if elapsedTime >= self.interval: 
             return True
         return False

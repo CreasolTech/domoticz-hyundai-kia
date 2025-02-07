@@ -3,6 +3,12 @@ ChangeLog
 
 TODO: near midnight, compute kWh/100km consumption
 
+2025-02-07 2.2
+Increased default pollinterval to reduce energy consumption: now data are
+fetched by default every 4 hours if the vehicle is not On nor charging.
+During the night (between 20 and 7) data us fetched with a interval*4 (but max
+720 minutes = 12 hours)
+
 2024-07-07 2.1
 BugFix: location address (HTTP user agent required) (thanks to @eekhoorn)
 
