@@ -198,12 +198,12 @@ Modules are available in two version:
 <a href="https://store.creasol.it/DomBusEVSE"><img src="https://images.creasol.it/creDomBusEVSE_plug_300.webp" alt="DomBusEVSE smart EVSE module to make a Smart Wallbox EV Charging station" style="float: left; margin-right: 2em;" align="left" /></a>
 Complete solution to make a Smart EVSE, **charging the electric vehicle using only energy from renewable source (photovoltaic, wind, ...), or adding 25-50-75-100% of available power from the grid**.
 
-* Single-phase and three-phases, up to 36A (8kW or 22kW)
+* **Single-phase and three-phase**, up to 32A (8kW or 22kW)
 * Needs external contactor, RCCB (protection) and EV cable
 * Optional power meter to measure charging power, energy, voltage and power factor
 * Optional power meter to measure the power usage from the grid (not needed if already exists)
-* **Two max grid power thresholds** can be programmed: for example, in Italy who have 6kW contractual power can drain from the grid Max (6* 1.27)=7.6kW for max 90 minutes followed by (6* 1.1)=6.6kW for another 90 minutes. **The module can use ALL available power** when programmed to charge at 100%.
-* **Works without the domotic controller** (stand-alone mode), and **can also work with charging current set by the domotic controller (managed mode)**
+* **Two max grid power thresholds** can be programmed: for example, in Italy who have 6kW contractual power can drain from the grid Max (6* 1.27)=7.6kW for max 90 minutes followed by (6* 1.1)=6.6kW for another 90 minutes: in this case **the EVSE module can drain ALL available power** when programmed to charge at 100% **minimizing the charge time and increasing the charging efficiency**.
+* **Works without the domotic controller** (stand-alone mode), and **can also work in *managed mode*, with an automation in the home automation system setting the charging current**
 
 <br clear="all"/>
 
@@ -314,19 +314,18 @@ Module that **check a deep-hole sun sensor to detect the direction of maximal su
 
 ### DomRelay2 - 2x relays board
 <a href="https://store.creasol.it/DomRelay2"><img src="https://images.creasol.it/creDomRelay22_200.png" alt="Relay board with 2 relays, to be used with DomBus domotic modules" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
-Simple module with 2 relays, to be used with DomBus modules or other electronic boards with open-collector or open-drain outputs
-* 2x 5A 12V SPST relays (Normally Open contact)
+Simple module with 2 relays, to be used with DomBus modules (like <a href="https://store.creasol.it/DomBusTH">DomBusTH</a> and <a href="https://store.creasol.it/DomBus12">DomBus12</a>) or other electronic boards with open-collector or open-drain outputs
+* **2x SPST relays 5A** (Normally Open contact)
 * Overvoltage protection (for inductive loads, like motors)
 * Overcurrent protection (for capacitive laods, like AC/DC power supply, LED bulbs, ...)
 <br clear="all"/>
 
 ### DomESP1 / DomESP2 - Board with relays and more for ESP8266 NodeMCU WiFi module
 <a href="https://store.creasol.it/DomESP1"><img src="https://images.creasol.it/creDomESP2_400.webp" alt="Relay board for ESP8266 NodeMCU module" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
-IoT board designed for NodeMCU v3 board using ESP8266 WiFi microcontroller
-* 9-24V input voltage, with high efficiency DC/DC regulator with 5V output
-* 4x SPST relays 5V with overvoltage protection
-* 1x SSR output (max 40V output)
-* 2x mosfet output (max 30V, 10A) for LED dimming or other DC loads
+**IoT board designed for NodeMCU v3 board using ESP8266 WiFi microcontroller**
+* 9÷24V power supply input, with high efficiency DC/DC regulator with 5V output
+* **4x SPST relays 5A with overvoltage protection** (varistor)
+* **2x mosfet outputs** (max 30V, 10A) for LED dimming or other DC loads
 * 1x I²C interface for sensors, extended I/Os and more)
 * 1x OneWire interface (DS18B20 or other 1wire sensors/devices)
 <br clear="all"/>
