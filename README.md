@@ -304,7 +304,7 @@ Module designed to be connected to alarm sensors (magnetc contact sensors, PIRs,
 <br clear="all"/>
 
 ### DomBusTracker - Dual axis sun tracker controller working with Domoticz, Home Assistant, Node-RED, Modbus, ... and also working in standalone with no external controllers
-<a href="https://store.creasol.it/DomBusTracker"><img src="https://images.creasol.it/creDomBusTracker_400.webp" alt="DomBusTracker smart home module that controls 2 linear actuators in a solar tracking system" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
+<a href="https://store.creasol.it/DomBusTracker"><img src="https://images.creasol.it/creDomBusTracker_sun_400.webp" alt="DomBusTracker smart home module that controls 2 linear actuators in a solar tracking system" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
 Module that check a deep-hole sun sensor to detect the direction of maximal sun radiation, working also in case of cloudy weather.
 Controls two external actuators/motors (linear or not) to move motors to reach the best tilt / elevation and azimuth position to optimize photovoltaic production.
 Check current through the motors to detect internal limit switch (useful for linear actuators) and find where the tracker reach the final/initial position.
