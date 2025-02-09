@@ -228,6 +228,14 @@ Includes:
 * 2 ports are configured by default as open-drain output and can drive up to 200mA led strip (with dimming function) or can be connected to the external module DomRelay2 to control 2 relays.
 <br clear="all"/>
 
+### DomBus21 - Latching relays domotic module
+<a href="https://store.creasol.it/DomBus21"><img src="https://images.creasol.it/creDomBus21_400.webp" alt="DomBus21 domotic module with 3 latching relays, 1 AC input and 4 low voltage inputs" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
+Very compact domotic module providing:
+* 3x latching relays SPST 15A: no power consumption when relays are On or Off!
+* 1x 230V AC opto-isolated input to detect 230V and power outage
+* 4x I/O lines, configurable as analog/digital inputs, temperature/distance sensor, counter, meter, ...
+<br clear="all"/>
+
 ### DomBus23 - Domotic module with many functions
 <a href="https://store.creasol.it/DomBus23"><img src="https://images.creasol.it/creDomBus23_400.webp" alt="DomBus23 domotic module with many functions" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
 Versatile module designed to control **gate or garage door**.
@@ -280,11 +288,27 @@ DIN rail module, low profile, with **12 relays outputs and very low power consum
 ### DomBus37 - 12 inputs, 3 115/230Vac inputs, 3 relay outputs
 <a href="https://store.creasol.it/DomBus37"><img src="https://images.creasol.it/creDomBus37_400.webp" alt="DomBus37 domotic module with 12 inputs, 3 AC inputs, 3 relay outputs" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
 Module designed to be connected to alarm sensors (magnetc contact sensors, PIRs, tampers): it's able to monitor mains power supply (power outage / blackout) and also have 3 relays outputs.
-* 12x low voltage inputs (analog/digital inputs, buttons, alarm sensors, counters, temperature and distance sensors, ...)
+* 12x low voltage inputs (analog/digital inputs, buttons, alarm sensors, balanced double/triple biased alarm sensors,  counters, meters, temperature and distance sensors, ...)
 * 3x 115/230Vac optoisolated inputs
 * 2x relays SPST 5A
 * 1x relay SPST 10A
-* In12 port can be used to send power supply to an external siren, monitoring current consumption
+<br clear="all"/>
+
+### DomBus38 - 12 inputs, 1 100-250Vac input, 6 relay outputs
+<a href="https://store.creasol.it/DomBus38"><img src="https://images.creasol.it/creDomBus38_400.webp" alt="DomBus38 smart home module with 12 inputs, 1 AC input, 6 SPDT relay outputs + 2 SPDT relay outputs 10A" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
+Module designed to be connected to alarm sensors (magnetc contact sensors, PIRs, tampers), lights and appliances outputs, ...
+* 12x low voltage inputs (analog/digital inputs, buttons, alarm sensors, balanced double/triple biased alarm sensors, counters, meters, temperature and distance sensors, ...)
+* 1x 115/230Vac optoisolated input to detect power outage and for zero-crossing detection (to switch relays minimizing the in-rush current)
+* 4x relays SPDT 10A (with Normally Open and Normally Closed contacts)
+* 2x relays SPST 10A (with only Normally Open contacts)
+<br clear="all"/>
+
+### DomBusTracker - Dual axis sun tracker controller working with Domoticz, Home Assistant, Node-RED, Modbus, ... and also working in standalone with no external controllers
+<a href="https://store.creasol.it/DomBusTracker"><img src="https://images.creasol.it/creDomBusTracker_400.webp" alt="DomBusTracker smart home module that controls 2 linear actuators in a solar tracking system" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
+Module that check a deep-hole sun sensor to detect the direction of maximal sun radiation, working also in case of cloudy weather.
+Controls two external actuators/motors (linear or not) to move motors to reach the best tilt / elevation and azimuth position to optimize photovoltaic production.
+Check current through the motors to detect internal limit switch (useful for linear actuators) and find where the tracker reach the final/initial position.
+Works autonomously, but also can be interface by Domoticz (DomBus protocol) and Home Assistant, NodeRED, OpenHAB, ... (using Modbus protocol).
 <br clear="all"/>
 
 ### DomRelay2 - 2x relays board
