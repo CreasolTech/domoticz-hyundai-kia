@@ -195,7 +195,7 @@ Modules are available in two version:
 
 
 ### DomBusEVSE - EVSE module to build a Smart Wallbox / EV charging station
-<a href="https://store.creasol.it/DomBusEVSE"><img src="https://images.creasol.it/creDomBusEVSE_200.png" alt="DomBusEVSE smart EVSE module to make a Smart Wallbox EV Charging station" style="float: left; margin-right: 2em;" align="left" /></a>
+<a href="https://store.creasol.it/DomBusEVSE"><img src="https://images.creasol.it/creDomBusEVSE_plug_300.webp" alt="DomBusEVSE smart EVSE module to make a Smart Wallbox EV Charging station" style="float: left; margin-right: 2em;" align="left" /></a>
 Complete solution to make a Smart EVSE, **charging the electric vehicle using only energy from renewable source (photovoltaic, wind, ...), or adding 25-50-75-100% of available power from the grid**.
 
 * Single-phase and three-phases, up to 36A (8kW or 22kW)
@@ -287,7 +287,7 @@ DIN rail module, low profile, with **12 relays outputs and very low power consum
 
 ### DomBus37 - 12 inputs, 3 115/230Vac inputs, 3 relay outputs
 <a href="https://store.creasol.it/DomBus37"><img src="https://images.creasol.it/creDomBus37_400.webp" alt="DomBus37 domotic module with 12 inputs, 3 AC inputs, 3 relay outputs" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
-Module designed to be connected to alarm sensors (magnetc contact sensors, PIRs, tampers): it's able to monitor mains power supply (power outage / blackout) and also have 3 relays outputs.
+Module designed to **interface alarm sensors (magnetc contact sensors, PIRs, tampers): it's able to monitor mains power supply (power outage / blackout) and also have 3 relays outputs.**
 * 12x low voltage inputs (analog/digital inputs, buttons, alarm sensors, balanced double/triple biased alarm sensors,  counters, meters, temperature and distance sensors, ...)
 * 3x 115/230Vac optoisolated inputs
 * 2x relays SPST 5A
@@ -296,7 +296,7 @@ Module designed to be connected to alarm sensors (magnetc contact sensors, PIRs,
 
 ### DomBus38 - 12 inputs, 1 100-250Vac input, 6 relay outputs
 <a href="https://store.creasol.it/DomBus38"><img src="https://images.creasol.it/creDomBus38_400.webp" alt="DomBus38 smart home module with 12 inputs, 1 AC input, 6 SPDT relay outputs + 2 SPDT relay outputs 10A" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
-Module designed to be connected to alarm sensors (magnetc contact sensors, PIRs, tampers), lights and appliances outputs, ...
+Module designed to **interface alarm sensors (magnetc contact sensors, PIRs, tampers), lights and appliances outputs, ...**
 * 12x low voltage inputs (analog/digital inputs, buttons, alarm sensors, balanced double/triple biased alarm sensors, counters, meters, temperature and distance sensors, ...)
 * 1x 115/230Vac optoisolated input to detect power outage and for zero-crossing detection (to switch relays minimizing the in-rush current)
 * 4x relays SPDT 10A (with Normally Open and Normally Closed contacts)
@@ -305,10 +305,11 @@ Module designed to be connected to alarm sensors (magnetc contact sensors, PIRs,
 
 ### DomBusTracker - Dual axis sun tracker controller working with Domoticz, Home Assistant, Node-RED, Modbus, ... and also working in standalone with no external controllers
 <a href="https://store.creasol.it/DomBusTracker"><img src="https://images.creasol.it/creDomBusTracker_sun_400.webp" alt="DomBusTracker smart home module that controls 2 linear actuators in a solar tracking system" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
-Module that check a deep-hole sun sensor to detect the direction of maximal sun radiation, working also in case of cloudy weather.
-Controls two external actuators/motors (linear or not) to move motors to reach the best tilt / elevation and azimuth position to optimize photovoltaic production.
-Check current through the motors to detect internal limit switch (useful for linear actuators) and find where the tracker reach the final/initial position.
-Works autonomously, but also can be interface by Domoticz (DomBus protocol) and Home Assistant, NodeRED, OpenHAB, ... (using Modbus protocol).
+Module that **check a deep-hole sun sensor to detect the direction of maximal sun radiation, working also in case of cloudy weather.**
+* Controls two external actuators/motors (linear or not) to move motors to reach the best tilt / elevation and azimuth position to optimize photovoltaic production.
+* **Check current through the motors to detect internal limit switch** (useful for linear actuators) and find where the tracker reach the final/initial position.
+* **Works autonomously** (stand-alone), without any home automation system controller, but **also can be interface by Domoticz** (DomBus protocol) and **Home Assistant, NodeRED, OpenHAB,** ... (using Modbus protocol).
+* Wire connection (RS485) to the domotic controller for the best reliability.
 <br clear="all"/>
 
 ### DomRelay2 - 2x relays board
