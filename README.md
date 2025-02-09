@@ -231,8 +231,8 @@ Includes:
 ### DomBus21 - Latching relays domotic module
 <a href="https://store.creasol.it/DomBus21"><img src="https://images.creasol.it/creDomBus21_400.webp" alt="DomBus21 domotic module with 3 latching relays, 1 AC input and 4 low voltage inputs" style="float: left; margin-right: 2em; vertical-align: middle;" align="left" /></a>
 Very compact domotic module providing:
-* 3x latching relays SPST 15A: no power consumption when relays are On or Off!
-* 1x 230V AC opto-isolated input to detect 230V and power outage
+* **3x latching relays SPST, max current 15A (3kW): no power consumption when relays are On or Off!**
+* 1x 230V AC opto-isolated input to detect 230V and power outage, with **zero-detection to switch relays/loads minimizing in-rush current**
 * 4x I/O lines, configurable as analog/digital inputs, temperature/distance sensor, counter, meter, ...
 <br clear="all"/>
 
