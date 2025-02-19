@@ -372,8 +372,10 @@ class BasePlugin:
                         options.set_temp=15
                     elif options.set_temp>27:
                         options.set_temp=27
-                    options.climate=True if options.set_temp<23 else False
-                    options.heating=True if options.set_temp>23 else False
+                    # options.climate=True if options.set_temp<23 else False
+                    options.climate=True # It's better to activate climate to dehumidify 
+                    options.heating=True if options.set_temp>=23 else False
+                    options.duration=10
                     ret=self.vm.start_climate(vehicleId, options)
                     Domoticz.Status(f"start_climate() with options={options}. Returned {ret}")
                     self.getDevID(Unit)
