@@ -20,6 +20,8 @@ Also it works with non-EV cars from Hyundai and Kia, monitoring the **fuel level
 
 It's also possible to **control the car, activating for example the climate** from the Domoticz panel.
 
+In the plugin configuration it's possible to set the cloud credential and also set the poll interval (time, in minutes, to wait before asking car data again) when car is OFF and ON. When plugin starts, it wait for the poll interval before asking data: this is good to prevent 12V battery discharge in case that plugin or domoticz restarts continously. To force cloud connection, use the "switch device" to force the update.
+
 Actually 30 devices will be created, using your language: English, Italian, Dutch, Swedish, Hungarian, Polish and French are supported, now, but if you want to contribute, just fetch the translation.txt file, add for each line the translation in your language, and send by email to linux AT creasol dot it.
 
 This plugin can be installed typing the following commands from a shell: instead of installing the plugin, (penultimate command),  **it's possible to use Python Plugin Manager or Python Plugins Manager** which also permit to update plugin easily or even automatically.
