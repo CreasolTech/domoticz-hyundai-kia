@@ -3,6 +3,12 @@ ChangeLog
 
 TODO: near midnight, compute kWh/100km consumption
 
+2025-02-27 2.3
+When plugin starts, previous version immediately started fetching data from
+Hyundai/Kia cloud. This can be a problem if the plugin or domoticz restart
+continuosly, leading to 12V battery discharge. Now when plugin/domoticz
+restart, it waits the polling time (4 hours?) before asking data to the cloud.
+
 2025-02-07 2.2
 Increased default pollinterval to reduce energy consumption: now data are
 fetched by default every 4 hours if the vehicle is not On nor charging.

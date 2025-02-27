@@ -11,9 +11,9 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="2.2" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="2.3" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
-        <h2>Domoticz Hyundai Kia connect plugin - 2.2</h2>
+        <h2>Domoticz Hyundai Kia connect plugin - 2.3</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
         tires status, door lock status, and much more.<br/>
         <b>Before activating this plugin, assure that you've set the right name to your car</b> (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.<br/>
@@ -230,8 +230,8 @@ class BasePlugin:
         self._pollInterval = int(Parameters["Mode1"])
         self._pollIntervalDriving = int(Parameters["Mode2"])
         self.vm = VehicleManager(region=int(Parameters["Address"]), brand=int(Parameters["Port"]), username=Parameters["Username"], password=Parameters["Password"], pin=Parameters["Mode3"])
-        self._lastPoll = None   # force reconnecting in 10 seconds 
-        #self._lastPoll = datetime.now() # do not reconnect in 10 seconds, to avoid daily connection exceeding during testing #DEBUG 
+        #self._lastPoll = None   # force reconnecting in 10 seconds: it may discharge the 12V battery in case that domoticz or plugin restarts continuosly!
+        self._lastPoll = datetime.now() # do not reconnect in 10 seconds, to avoid daily connection exceeding during testing
         self.hwid=Parameters['HardwareID']
 
         #logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.INFO)
