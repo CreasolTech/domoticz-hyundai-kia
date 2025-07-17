@@ -257,7 +257,13 @@ class BasePlugin:
                                 self.getDevID(Unit+1)
                                 dc=int(Devices[self.devID].Units[Unit+1].sValue)
                                 Domoticz.Status(f"Set charge limits for device Unit={Unit}, AC={ac}, DC={dc}")
-                                ret=self.vm.set_charge_limits(vehicleId, ac, dc)
+                                try:
+                                    ret=self.vm.set_charge_limits(vehicleId, ac, dc)
+                                except:
+                                    # refresh token
+                                    self.vm.check_and_refresh_token()
+                                    ret=self.vm.set_charge_limits(vehicleId, ac, dc)
+
                         bases>>=1
                         base+=UNITMASK+1   # is next base 
             elif self.mustPoll():   # check if vehicles data should be polled. return False if polling is already in progress 
