@@ -65,7 +65,7 @@
 import DomoticzEx as Domoticz
 import json
 import re
-#import logging
+import logging
 from math import cos, asin, sqrt, pi
 import time
 import requests
@@ -235,7 +235,7 @@ class BasePlugin:
         self.hwid=Parameters['HardwareID']
 
         #logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.INFO)
-        #logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.DEBUG) #DEBUG
+        logging.basicConfig(filename='/var/log/domoticz.log', encoding='utf-8', level=logging.DEBUG) #DEBUG
 
     def onHeartbeat(self):
         """ Called every 10 seconds or other interval set by Domoticz.Heartbeat() """

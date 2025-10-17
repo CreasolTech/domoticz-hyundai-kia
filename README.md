@@ -94,6 +94,20 @@ Then, enter Domoticz panel, go to Setup -> Hardware and enable the Hyundai Kia c
 Please note that there are some restrictions on the number of daily access to the cloud... for example EU customers cannot connect more than 200 times/day
 Also, the vehicle consumes energy for every access, so **do not poll the car too often when it is not moving nor charging.**
 
+## Password or Token ?
+Since August 2025, access to the cloud needs a google recaptcha. For this reason logging to the cloud API is a bit complicated now, but fortunally there is a python script that helps getting the refresh tocken that can be used instead of the password to log the Kia / Hyundai cloud. Below the instructions to do that:
+
+Assure that the hyundai-kia-connect-api module is updated, in case enter that directory and hit **git pull** to update
+
+For European KIA users, download the python script from https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/wiki/Kia-Europe-Login-Flow
+
+Have a look at the issues at the git repository for description off alternatives for Hyundai.
+
+Run the python script and follow the instructions to login to Kia or Hyundai cloud and get the refresh token; write the refresh token in the password field of domoticz-hyundai-kia-plugin (domoticz Setup -> Hardware) and click on Update button to restart the plugin 
+
+We want to thank a lot to all people working to find a solution to the recaptcha problem!
+
+
 ## Updating
 
 Sometimes a new version of this plugin also requires an update of the *hyundai_kia_connect_api* module.
