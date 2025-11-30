@@ -11,9 +11,9 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="2.3" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="2.4" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
-        <h2>Domoticz Hyundai Kia connect plugin - 2.3</h2>
+        <h2>Domoticz Hyundai Kia connect plugin - 2.4</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
         tires status, door lock status, and much more.<br/>
         <b>Before activating this plugin, assure that you've set the right name to your car</b> (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.<br/>
@@ -141,6 +141,7 @@ class BasePlugin:
         self._pollInterval = 240        # fetch data every 120 minutes, by default (but check parameter Mode1!)
         self._pollIntervalDriving = 30 # while charging, fetch data quickly 
         self.interval = 10              # current polling interval (depending by charging, moving, night time, ...) It's set by mustPoll()
+        self._lastTokenTime = None
         self._lastPoll = None           # last time I got vehicle status
         self._setChargeLimits = 0       # if > 0 => decrement every HeartBeat interval, and when zero set the charging limit
         self._fetchingData = 0          # 0 if system is not fetching data from cloud, >0 if it's fetching (incremented every onHeartBeat)
@@ -160,6 +161,20 @@ class BasePlugin:
     def getDevID(self, Unit):
         self.devID="{:04X}{:04X}".format(self.hwid, Unit)    # DeviceID compatible with previous plugin version
 
+    def refreshToken(self):
+        """If token is expired, refresh token"""
+        if self._lastTokenTime and (datetime.now()-self._lastTokenTime).total_seconds() < 3500:
+            return  # no need to refresh token (refreshed less than 3500s ago
+        Domoticz.Status("*** refreshToken()...")
+        try:
+            self.vm.check_and_refresh_token()
+        except AuthenticationError as AuthError:
+            Domoticz.Status(f"AuthError: {AuthError}")
+        except:
+            Domoticz.Status(f"Unknown error")
+        self._lastTokenTime=datetime.now()
+                
+                                                           
     def getVehicleId(self, Unit):
             # get name and id for the vehicle associated to Devices[Unit]
             vehicleId = False
@@ -257,26 +272,14 @@ class BasePlugin:
                                 self.getDevID(Unit+1)
                                 dc=int(Devices[self.devID].Units[Unit+1].sValue)
                                 Domoticz.Status(f"Set charge limits for device Unit={Unit}, AC={ac}, DC={dc}")
-                                try:
-                                    ret=self.vm.set_charge_limits(vehicleId, ac, dc)
-                                except:
-                                    # refresh token
-                                    self.vm.check_and_refresh_token()
-                                    ret=self.vm.set_charge_limits(vehicleId, ac, dc)
+                                self.refreshToken() # Refresh token, if expired
+                                ret=self.vm.set_charge_limits(vehicleId, ac, dc)
 
                         bases>>=1
                         base+=UNITMASK+1   # is next base 
             elif self.mustPoll():   # check if vehicles data should be polled. return False if polling is already in progress 
                 self._lastPoll = datetime.now()
-                Domoticz.Status("*** check_and_refresh_token()...")
-                #ret=self.vm.check_and_refresh_token()
-                try:
-                    self.vm.check_and_refresh_token()
-                except AuthenticationError as AuthError:
-                    Domoticz.Status(f"AuthError: {AuthError}")
-                except:
-                    Domoticz.Status(f"Unknown error")
-
+                self.refreshToken()
                 Domoticz.Status(f"*** check_and_force_update_vehicles({self.interval*30})...")
                 #Domoticz.Status(f"*** force_refresh_all_vehicles_states()...")
                 try:
@@ -382,11 +385,14 @@ class BasePlugin:
                     options.climate=True # It's better to activate climate to dehumidify 
                     options.heating=True if options.set_temp>=23 else False
                     options.duration=10
+
+                    self.refreshToken() # Refresh token, if expired
                     ret=self.vm.start_climate(vehicleId, options)
                     Domoticz.Status(f"start_climate() with options={options}. Returned {ret}")
                     self.getDevID(Unit)
                     self.update(Unit, 1, "On")   # Update device 
                 else:   # Off command
+                    self.refreshToken() # Refresh token, if expired
                     ret=self.vm.stop_climate(vehicleId)
                     Domoticz.Status(f"stop_climate() returned {ret}")
                     self.getDevID(Unit)
@@ -401,10 +407,12 @@ class BasePlugin:
             elif (Unit&UNITMASK) == DEVS["OPEN"][0]:   # open/close
                 if Command == "On": # => lock
                     Domoticz.Status(f"lock command")
+                    self.refreshToken() # Refresh token, if expired
                     ret=self.vm.lock(vehicleId)
                     self.update(Unit, 1, "On")
                 else:   # Off command => unlock
                     Domoticz.Log(f"unlock command")
+                    self.refreshToken() # Refresh token, if expired
                     ret=self.vm.unlock(vehicleId)
                     self.update(Unit, 0, "Off")
             elif (Unit&UNITMASK) == DEVS["EVLIMITAC"][0] or (Unit&UNITMASK) == DEVS["EVLIMITDC"][0]:
@@ -418,10 +426,12 @@ class BasePlugin:
                 if Command == "On":
                     Domoticz.Status(f"Received command to start charging")
                     self.update(Unit, 1, "On")
+                    self.refreshToken() # Refresh token, if expired
                     ret=self.vm.start_charge(vehicleId)
                 else:
                     Domoticz.Status(f"Received command to stop charging")
                     self.update(Unit, 0, "Off")
+                    self.refreshToken() # Refresh token, if expired
                     ret=self.vm.stop_charge(vehicleId)
 
 
