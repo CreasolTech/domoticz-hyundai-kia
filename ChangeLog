@@ -3,6 +3,9 @@ ChangeLog
 
 TODO: near midnight, compute kWh/100km consumption
 
+2026-02-08 2.5
+Fixed DIMMER issue: nValue=2 in case of dimmer, to show the % value
+
 2025-11-30 2.4
 Before sending a command, check if token is older than 3500s, in that case
 refresh token before sending the command

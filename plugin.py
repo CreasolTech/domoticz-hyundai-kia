@@ -11,9 +11,9 @@
 #
 
 """
-<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="2.4" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
+<plugin key="domoticz-hyundai-kia" name="Hyundai Kia connect" author="CreasolTech, WillemD61" version="2.5" externallink="https://github.com/CreasolTech/domoticz-hyundai-kia">
     <description>
-        <h2>Domoticz Hyundai Kia connect plugin - 2.4</h2>
+        <h2>Domoticz Hyundai Kia connect plugin - 2.5</h2>
         This plugin permits to access, through the Hyundai Kia account credentials, to information about your Hyundai and Kia vehicles, such as odometer, EV battery charge, 
         tires status, door lock status, and much more.<br/>
         <b>Before activating this plugin, assure that you've set the right name to your car</b> (through the Hyundai/Kia connect app): that name is used to identify devices in Domoticz.<br/>
@@ -206,6 +206,12 @@ class BasePlugin:
             Domoticz.Status(f"Creating device {dev[0]} {dev[LANGBASE]}...")
             Domoticz.Unit(DeviceID=self.devID, Unit=Unit, Name=f"{self.vehicleName}: {dev[self._devlang] or dev[LANGBASE]}", Type=dev[1], Subtype=dev[2], Switchtype=dev[3], Options=dev[4], Used=1).Create()
 
+        nValue=int(nValue)
+        if Devices[self.devID].Units[Unit].SwitchType == 7 and Devices[self.devID].Units[Unit].SubType == 62 and Devices[self.devID].Units[Unit].Type == 244: #DIMMER TYPE
+            nValue = 2  # Show % instead of "On" or "Off"
+            if (str(sValue) == 0):
+                nValue = 0
+                sValue = 1
         Devices[self.devID].Units[Unit].nValue=int(nValue)
         Devices[self.devID].Units[Unit].sValue=str(sValue)
         Devices[self.devID].Units[Unit].Update()
@@ -268,9 +274,19 @@ class BasePlugin:
                             self.getDevID(Unit)
                             vehicleId=self.getVehicleId(Unit) # get name and id for the vehicle
                             if vehicleId!=False:
-                                ac=int(Devices[self.devID].Units[Unit].sValue)
+                                if Devices[self.devID].Units[Unit].sValue == 'On':
+                                    ac = 80
+                                elif Devices[self.devID].Units[Unit].sValue == 'Off':
+                                    ac = 0 
+                                else:
+                                    ac=int(Devices[self.devID].Units[Unit].sValue)
                                 self.getDevID(Unit+1)
-                                dc=int(Devices[self.devID].Units[Unit+1].sValue)
+                                if Devices[self.devID].Units[Unit+1].sValue == 'On':
+                                    dc = 80
+                                elif Devices[self.devID].Units[Unit+1].sValue == 'Off':
+                                    dc = 0 
+                                else:
+                                    dc = int(Devices[self.devID].Units[Unit+1].sValue)
                                 Domoticz.Status(f"Set charge limits for device Unit={Unit}, AC={ac}, DC={dc}")
                                 self.refreshToken() # Refresh token, if expired
                                 ret=self.vm.set_charge_limits(vehicleId, ac, dc)
@@ -287,8 +303,8 @@ class BasePlugin:
                     # whether it is time to get data is determine by the "mustPoll()" check above, no need to test again in the API
                     self.vm.force_refresh_all_vehicles_states()  # Get data from the cloud, new and existing. Note not all data is continuously updated in the cloud. 
                     self.vm.update_all_vehicles_with_cached_state() # Both these statements are needed to get data for all variables.
-                except Exception:
-                    Domoticz.Status(f"Exception")
+                except Exception as e:
+                    Domoticz.Status(f"Exception: {e}")
 
                 self._isCharging=False  # set to false: if one vehicle is charging, this flag will be set by updateDevices()
                 self._engineOn=False    # set to false: if one vehicle is moving,   this flag will be set by updateDevices()
@@ -421,7 +437,7 @@ class BasePlugin:
                 self._setChargeLimits|=16<<(Unit>>6)    #store in setChargeLimits which devices have been changed 0bzyxw0010 where w=1 if base=0, x=1 if base=64, y=1 if base=128, ...
                 Level=Level-Level%10    # Level should be 0, 10, 20, 30, ...
                 Domoticz.Status(f"New value={Level}")
-                self.update(Unit, 1, str(Level))
+                self.update(Unit, 2, str(Level))    #nValue=2 => show %
             elif (Unit&UNITMASK) == DEVS["EVCHARGEON"][0]:    # Start or stop charging
                 if Command == "On":
                     Domoticz.Status(f"Received command to start charging")
@@ -478,9 +494,6 @@ class BasePlugin:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nVar=int(var)
             nValue=2
-            sValue=var
-            if nVar==100: nValue=1
-            if nVar==0: nValue=0
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
         k='EVLIMITDC'; dev=DEVS[k]; var=getattr(v, 'ev_charge_limits_dc', None)
@@ -490,8 +503,6 @@ class BasePlugin:
             nVar=int(var)
             nValue=2
             sValue=var
-            if nVar==100: nValue=1
-            if nVar==0: nValue=0
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
         k='FUELLEVEL'; dev=DEVS[k]; var=getattr(v, 'fuel_level', None)
