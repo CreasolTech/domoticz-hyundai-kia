@@ -494,6 +494,7 @@ class BasePlugin:
             if self.verbose: Domoticz.Status(f"{k}={var}")
             nVar=int(var)
             nValue=2
+            sValue=var
             unit=base+dev[0]; self.getDevID(unit); self.update(unit, nValue, sValue)
             
         k='EVLIMITDC'; dev=DEVS[k]; var=getattr(v, 'ev_charge_limits_dc', None)
