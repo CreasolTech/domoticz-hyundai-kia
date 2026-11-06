@@ -95,6 +95,8 @@ Please note that there are some restrictions on the number of daily access to th
 Also, the vehicle consumes energy for every access, so **do not poll the car too often when it is not moving nor charging.**
 
 ## Password or Token ?
+**Since October 2026, it's possible to access the Kia/Hyundai cloud by simply specifying the password**. It's no more needed to get a token as requested from August 2025 to mid October 2026!
+
 Since August 2025, access to the cloud needs a google recaptcha. For this reason logging to the cloud API is a bit complicated now, but fortunally there is a python script that helps getting the refresh tocken that can be used instead of the password to log the Kia / Hyundai cloud. Below the instructions to do that:
 
 Assure that the hyundai-kia-connect-api module is updated, in case enter that directory and hit **git pull** to update
